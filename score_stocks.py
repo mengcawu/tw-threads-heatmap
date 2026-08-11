@@ -86,9 +86,12 @@ RS_SCALE = 2.5  # 相對大盤 +20 個百分點 -> 滿分100；-20個百分點 -
 TOP_N = 10  # veto後倖存者取前 TOP_N 檔；不足 TOP_N 檔就全部列出，不補齊
 
 # ---- Veto 硬性排除層（四維評分算完、排序前執行；不符合任一條直接踢除，不論總分）----
-# 條件1：當日融資「增加」張數 > 此絕對門檻（張）-> 踢除
-#   （只看增加；絕對值門檻，不用比例；若當日融資變化缺資料，這條從寬不踢）
-MARGIN_INCREASE_VETO_LOTS = 2000
+# 條件1：近5日累計融資「增加」張數 > 此絕對門檻（張）-> 踢除
+#   （跟維度2「法人買、散戶沒跟」用同一個近5日窗口與同一種算法（近5日
+#   MarginChange 加總），避免評分事實講「融資增X張(5日)」卻只用單日判斷
+#   veto 的窗口不一致；只看增加，絕對值門檻，不用比例；
+#   近5日融資資料不完整，這條從寬不踢）
+MARGIN_INCREASE_VETO_LOTS = 3000
 # 條件2：當日量能倍數（定義同維度3：當日成交量 / 近5日(不含當日)均量）> 此值 -> 踢除
 VETO_VOLUME_RATIO_HIGH = 2.0
 # 條件3：當日量能倍數 < 此值 -> 踢除
@@ -350,16 +353,16 @@ def check_veto(code, dates_20d, price_by_date, margin_series):
 
     margin_by_date = margin_series.get(code)
     if margin_by_date:
-        today = dates_20d[-1]
-        today_rec = margin_by_date.get(today)
-        if today_rec is not None:
-            margin_change_today = today_rec[1]
-            if margin_change_today > MARGIN_INCREASE_VETO_LOTS:
+        recent_dates = dates_20d[-RECENT_WINDOW:]
+        margin_recs = [margin_by_date.get(d) for d in recent_dates]
+        if all(r is not None for r in margin_recs):
+            margin_chg_5d = sum(r[1] for r in margin_recs)
+            if margin_chg_5d > MARGIN_INCREASE_VETO_LOTS:
                 reasons.append(
-                    f"融資單日增加{margin_change_today:.0f}張"
+                    f"近5日融資累計增加{margin_chg_5d:.0f}張"
                     f"（>{MARGIN_INCREASE_VETO_LOTS}張）"
                 )
-        # 缺當日融資變化資料 -> 從寬不踢，不加入 reasons
+        # 近5日融資資料不完整 -> 從寬不踢，不加入 reasons
 
     ratio = compute_volume_ratio(dates_20d, price_by_date)
     if ratio is not None:
