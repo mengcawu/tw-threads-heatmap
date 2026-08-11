@@ -10,7 +10,9 @@
     data/taiex.csv               Date,TAIEX_Close（大盤發行量加權股價指數，TWSE 官方逐日查詢）
 
 輸出：
-    stdout 印出完整 JSON 榜單（前 TOP_N 檔），供人工檢驗。
+    stdout 印出完整 JSON 榜單，供人工檢驗。四維加權分數算完、排序前，先跑一層
+    veto 硬性排除（見 VETO_* 常數），不符合veto條件的直接踢除、不論總分多高；
+    veto後倖存者依總分排序，取前 TOP_N 檔——不足 TOP_N 檔就全部列出、不補齊。
 
 所有數字皆來自上述 CSV 的實際資料，不做任何估計/造假；缺資料一律照下方
 「缺漏處理」規則處理，不使用臆測值。
@@ -81,7 +83,16 @@ NO_UPTREND_SCORE_CAP = 40  # 近5日收盤未走高時，維度3分數上限（�
 # score = clip(50 + rs_pct * RS_SCALE, 0, 100)；RS_SCALE 代表每 1 個百分點相對強度對應的分數
 RS_SCALE = 2.5  # 相對大盤 +20 個百分點 -> 滿分100；-20個百分點 -> 0分
 
-TOP_N = 15
+TOP_N = 10  # veto後倖存者取前 TOP_N 檔；不足 TOP_N 檔就全部列出，不補齊
+
+# ---- Veto 硬性排除層（四維評分算完、排序前執行；不符合任一條直接踢除，不論總分）----
+# 條件1：當日融資「增加」張數 / 前一日融資餘額 > 此比例 -> 踢除
+#   （只看增加；若前一日餘額缺資料無法算比例，這條從寬不踢）
+VETO_MARGIN_INCREASE_RATIO = 0.05
+# 條件2：當日量能倍數（定義同維度3：當日成交量 / 近5日(不含當日)均量）> 此值 -> 踢除
+VETO_VOLUME_RATIO_HIGH = 2.0
+# 條件3：當日量能倍數 < 此值 -> 踢除
+VETO_VOLUME_RATIO_LOW = 0.7
 
 NOTES = [
     "全額交割/處置/注意股標記：本資料集（data/stock_day_common.csv 等）未包含此標記欄位，"
@@ -256,9 +267,24 @@ def score_buy_without_retail(code, dates_20d, inst_series, margin_series):
     return score, fact
 
 
+def compute_volume_ratio(dates_20d, price_by_date):
+    """今日成交量 / 近5個交易日(不含今日)均量。資料不足或均量為0回傳 None。
+
+    維度3評分與 veto 層都呼叫這個函式，確保兩處「量能倍數」定義完全一致。
+    """
+    if len(dates_20d) < RECENT_WINDOW + VOLUME_RATIO_LOOKBACK + 1:
+        return None
+    today = dates_20d[-1]
+    vol_base_dates = dates_20d[-1 - VOLUME_RATIO_LOOKBACK : -1]
+    avg_vol_5d = sum(price_by_date[d][1] for d in vol_base_dates) / len(vol_base_dates)
+    if avg_vol_5d <= 0:
+        return None
+    vol_today = price_by_date[today][1]
+    return vol_today / avg_vol_5d
+
+
 def score_mild_volume_uptrend(code, dates_20d, price_by_date):
     """維度3：近5日收盤走高，且量能倍數落在1.0~1.8 -> 高分；爆量扣分。"""
-    idx_map = {d: i for i, d in enumerate(dates_20d)}
     if len(dates_20d) < RECENT_WINDOW + VOLUME_RATIO_LOOKBACK + 1:
         return NEUTRAL_SCORE, "近期交易日數不足，無法計算量能倍數"
 
@@ -268,12 +294,9 @@ def score_mild_volume_uptrend(code, dates_20d, price_by_date):
     close_5d_ago = price_by_date[d_minus_5][0]
     uptrend = close_today > close_5d_ago
 
-    vol_base_dates = dates_20d[-1 - VOLUME_RATIO_LOOKBACK : -1]
-    avg_vol_5d = sum(price_by_date[d][1] for d in vol_base_dates) / len(vol_base_dates)
-    vol_today = price_by_date[today][1]
-    if avg_vol_5d <= 0:
+    ratio = compute_volume_ratio(dates_20d, price_by_date)
+    if ratio is None:
         return NEUTRAL_SCORE, "近5日均量為0，無法計算量能倍數"
-    ratio = vol_today / avg_vol_5d
 
     lo, hi = VOL_HIGH_BAND
     if ratio > VOL_EXTREME_HIGH:
@@ -317,6 +340,43 @@ def score_relative_strength(code, dates_20d, price_by_date, taiex_by_date):
 
 
 # ============================================================
+# Veto 硬性排除層（四維評分之後、排序之前執行）
+# ============================================================
+
+
+def check_veto(code, dates_20d, price_by_date, margin_series):
+    """回傳 (是否踢除, 原因字串或None)。任一條件觸發即踢除，原因可能多條合併。"""
+    reasons = []
+
+    margin_by_date = margin_series.get(code)
+    if margin_by_date:
+        today = dates_20d[-1]
+        prev_dates = [d for d in dates_20d if d < today]
+        today_rec = margin_by_date.get(today)
+        prev_rec = margin_by_date.get(prev_dates[-1]) if prev_dates else None
+        if today_rec is not None and prev_rec is not None and prev_rec[0] > 0:
+            margin_change_today = today_rec[1]
+            prev_balance = prev_rec[0]
+            ratio = margin_change_today / prev_balance
+            if ratio > VETO_MARGIN_INCREASE_RATIO:
+                reasons.append(
+                    f"融資單日增加{margin_change_today:.0f}張，"
+                    f"為前一日餘額{prev_balance:.0f}張的{ratio * 100:.1f}%"
+                    f"（>{VETO_MARGIN_INCREASE_RATIO * 100:.0f}%）"
+                )
+        # 缺前一日融資餘額無法算比例 -> 從寬不踢，不加入 reasons
+
+    ratio = compute_volume_ratio(dates_20d, price_by_date)
+    if ratio is not None:
+        if ratio > VETO_VOLUME_RATIO_HIGH:
+            reasons.append(f"量能{ratio:.1f}倍（>{VETO_VOLUME_RATIO_HIGH}倍）")
+        elif ratio < VETO_VOLUME_RATIO_LOW:
+            reasons.append(f"量能{ratio:.1f}倍（<{VETO_VOLUME_RATIO_LOW}倍）")
+
+    return (len(reasons) > 0), "；".join(reasons) if reasons else None
+
+
+# ============================================================
 # 主流程
 # ============================================================
 
@@ -339,6 +399,7 @@ def main():
         qualified.append((code, rows, avg_value_20d, recent20))
 
     ranked = []
+    vetoed = []
     for code, rows, avg_value_20d, recent20 in qualified:
         dates_20d = [r[0] for r in recent20]
         price_by_date = {r[0]: (r[1], r[2], r[3]) for r in rows}
@@ -362,6 +423,18 @@ def main():
             change_pct = (last_close / prev_close - 1) * 100
         else:
             change_pct = None
+
+        is_vetoed, veto_reason = check_veto(code, dates_20d, price_by_date, margin_series)
+        if is_vetoed:
+            vetoed.append(
+                {
+                    "code": code,
+                    "name": names.get(code, ""),
+                    "reason": veto_reason,
+                    "total_score": round(total, 2),
+                }
+            )
+            continue
 
         ranked.append(
             {
@@ -397,17 +470,22 @@ def main():
         )
 
     ranked.sort(key=lambda r: r["total_score"], reverse=True)
-    top = ranked[:TOP_N]
+    top = ranked[:TOP_N]  # 不足 TOP_N 檔就全部列出（切片天然涵蓋「不足不補」）
+    vetoed.sort(key=lambda r: r["total_score"], reverse=True)
 
     output = {
         "report_date": report_date,
         "qualified_count": len(qualified),
+        "vetoed_count": len(vetoed),
         "ranked_count": len(top),
         "thresholds": {
             "lookback_days": LOOKBACK_DAYS,
             "min_avg_value_20d": MIN_AVG_VALUE_20D,
             "market_cap_threshold_ntd": MARKET_CAP_THRESHOLD,
             "market_cap_proxy_min_avg_value_20d": PROXY_MIN_AVG_VALUE_20D,
+            "veto_margin_increase_ratio": VETO_MARGIN_INCREASE_RATIO,
+            "veto_volume_ratio_high": VETO_VOLUME_RATIO_HIGH,
+            "veto_volume_ratio_low": VETO_VOLUME_RATIO_LOW,
         },
         "weights": {
             "institutional_streak": WEIGHT_INSTITUTIONAL_STREAK,
@@ -416,6 +494,7 @@ def main():
             "relative_strength": WEIGHT_RELATIVE_STRENGTH,
         },
         "notes": NOTES,
+        "vetoed": vetoed,
         "ranking": top,
     }
 

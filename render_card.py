@@ -6,7 +6,10 @@
 流程：
     1. 執行 score_stocks.py，讀取其 stdout 的完整 JSON（不重新計算分數，
        單純視覺化既有結果），同時另存一份到 output/leaderboard.json 供之後發布用。
-    2. 取榜單前 10 檔，組成 HTML（深色主題，沿用 dataviz skill 的驗證色票）。
+    2. 榜單（score_stocks.py 已經是 veto 後、最多 TOP_N=10 檔的最終名單）全部畫出，
+       依「實際檔數」動態算列高／字級縮放比例，8檔、10檔、12檔都不裁切、不留大空白。
+       採兩階段渲染：先用預設縮放畫一次、實際量測 .list 可用高度（不用猜的常數），
+       算出精確縮放比例後再重畫一次，避免估計值誤差造成裁切或空白。
     3. 用 Playwright + Chromium 以 2x 解析度截圖，再縮回 1080x1080，
        文字邊緣更乾淨（縮圖可讀性優先）。
 
@@ -28,23 +31,67 @@ OUTPUT_PNG = OUTPUT_DIR / "leaderboard_card.png"
 OUTPUT_JSON = OUTPUT_DIR / "leaderboard.json"
 HTML_SCRATCH = Path("/tmp/leaderboard_card_render.html")
 
-TOP_N_CARD = 10
+CARD_MAX_ROWS = 15  # 防禦性上限；score_stocks.py 目前 veto 後最多輸出 10 檔
 CANVAS = 1080
 SCALE = 2  # 先用 2x 截圖再縮小，字更清晰
 
-# 版面高度預算（固定像素，避免 flex 內容撐爆導致截斷/重疊）：
-# 40(頂padding) + 128(header) + 3*ROW_TOP3 + 7*ROW_REST + 62(footer) + 28(底padding) = 1080
 CARD_PAD_TOP = 40
 CARD_PAD_BOTTOM = 28
-HEADER_HEIGHT = 128
-FOOTER_HEIGHT = 62
-ROW_TOP3_HEIGHT = 98
-ROW_REST_HEIGHT = 58
-_LIST_BUDGET = CANVAS - CARD_PAD_TOP - CARD_PAD_BOTTOM - HEADER_HEIGHT - FOOTER_HEIGHT
-_LIST_USED = 3 * ROW_TOP3_HEIGHT + (TOP_N_CARD - 3) * ROW_REST_HEIGHT
-assert _LIST_USED <= _LIST_BUDGET, (
-    f"row heights ({_LIST_USED}px) exceed available list budget ({_LIST_BUDGET}px)"
-)
+# 安全係數：即使量到精確可用高度，仍只填到這個比例，留一點餘裕防止字型
+# 渲染的些微差異（sub-pixel/行高）造成裁切。
+SAFETY_FACTOR = 0.97
+
+# 版面基準規格（在 N=10 檔、scale=1.0 時，是實測不裁切/不留白的版本）。
+# 檔數變動時，整組數值依 compute_scale() 算出的縮放比例一起放大/縮小，
+# 而不是只調列高：字級、內距、tag 間距全部同步縮放，維持比例協調。
+BASE_SPEC = {
+    "row_top3_h": 98,
+    "row_rest_h": 58,
+    "rank_top3_font": 44,
+    "rank_top3_w": 66,
+    "rank_rest_font": 26,
+    "rank_w": 54,
+    "name_top3_font": 40,
+    "name_rest_font": 27,
+    "code_top3_font": 24,
+    "code_rest_font": 18,
+    "close_top3_font": 32,
+    "close_top3_w": 130,
+    "close_rest_font": 24,
+    "close_rest_w": 110,
+    "chg_top3_font": 30,
+    "chg_top3_w": 130,
+    "chg_top3_pad": 6,
+    "chg_rest_font": 21,
+    "chg_rest_w": 108,
+    "chg_rest_pad": 3,
+    "score_top3_font": 34,
+    "score_top3_w": 96,
+    "score_top3_pad": 6,
+    "score_rest_font": 22,
+    "score_rest_w": 78,
+    "score_rest_pad": 3,
+    "tag_top3_font": 20,
+    "tag_rest_font": 14,
+    "tag_pad_v": 3,
+    "tag_pad_h": 10,
+    "tag_rest_pad_v": 1,
+    "tag_rest_pad_h": 7,
+    "tags_top3_margin": 6,
+    "tags_rest_margin": 2,
+    "tags_top3_padleft": 70,
+    "tags_rest_padleft": 62,
+    "row_gap": 16,
+    "tags_gap": 8,
+}
+# 縮放比例上下限：避免檔數極少時字放到誇張大，或極多時縮到不可讀。
+# 卡片寬度固定 1080px，不像高度能靠檔數自然分配——SCALE_MAX 刻意保守（而非跟
+# SCALE_MIN 對稱地衝到 1.6），確保就算檔數很少、垂直方向有很多空間可以放大，
+# 兩側欄位（排名/收盤/漲跌/分數色塊）+ 股名代號 加總寬度仍不會超過 1080，
+# 不然股名會被擠到觸發 ellipsis 截斷，或欄位彼此重疊。這個上限是用最壞情況
+# （3個中文字股名 + 4碼代號）反推、留了緩衝的結果，見開發過程驗證。
+SCALE_MIN = 0.75
+SCALE_MAX = 1.35
 
 CHROMIUM_PATH = "/opt/pw-browsers/chromium"
 
@@ -72,12 +119,29 @@ def run_scoring():
     return json.loads(result.stdout)
 
 
+def compute_scale(n_rows, list_budget):
+    """依實際檔數與量到的可用高度，算出 BASE_SPEC 該放大/縮小多少倍。"""
+    if n_rows <= 0:
+        return 1.0
+    top3 = min(3, n_rows)
+    rest = max(0, n_rows - 3)
+    ref_total = top3 * BASE_SPEC["row_top3_h"] + rest * BASE_SPEC["row_rest_h"]
+    if ref_total <= 0:
+        return 1.0
+    scale = (list_budget * SAFETY_FACTOR) / ref_total
+    return max(SCALE_MIN, min(SCALE_MAX, scale))
+
+
+def scaled_spec(scale):
+    return {k: v * scale for k, v in BASE_SPEC.items()}
+
+
 def lerp(a, b, t):
     return a + (b - a) * t
 
 
 def score_color(score, score_min, score_max):
-    # 依本次上榜前12檔的實際分數區間正規化，而非固定 0~100，
+    # 依本次上榜檔數的實際分數區間正規化，而非固定 0~100，
     # 讓深淺差異在分數集中的情況下仍清楚可辨。
     span = score_max - score_min
     t = 0.5 if span <= 0 else (score - score_min) / span
@@ -167,12 +231,15 @@ def build_row_html(rank, entry, score_min, score_max):
     """
 
 
-def build_html(data):
-    top12 = data["ranking"][:TOP_N_CARD]
-    scores = [e["total_score"] for e in top12]
+def build_html(data, scale):
+    rows = data["ranking"][:CARD_MAX_ROWS]
+    n = len(rows)
+    sv = scaled_spec(scale)
+
+    scores = [e["total_score"] for e in rows] or [0]
     score_min, score_max = min(scores), max(scores)
     rows_html = "".join(
-        build_row_html(i + 1, e, score_min, score_max) for i, e in enumerate(top12)
+        build_row_html(i + 1, e, score_min, score_max) for i, e in enumerate(rows)
     )
 
     return f"""<!doctype html>
@@ -194,7 +261,7 @@ def build_html(data):
     height: {CANVAS}px;
     display: flex;
     flex-direction: column;
-    padding: 40px 44px 28px;
+    padding: {CARD_PAD_TOP}px 44px {CARD_PAD_BOTTOM}px;
   }}
   .header {{
     flex: 0 0 auto;
@@ -242,27 +309,27 @@ def build_html(data):
     border-bottom: 1px solid {COLOR_HAIRLINE};
     overflow: hidden;
   }}
-  .row-top3 {{ height: {ROW_TOP3_HEIGHT}px; flex: none; }}
-  .row-rest {{ height: {ROW_REST_HEIGHT}px; flex: none; }}
+  .row-top3 {{ height: {sv['row_top3_h']:.1f}px; flex: none; }}
+  .row-rest {{ height: {sv['row_rest_h']:.1f}px; flex: none; }}
   .row-main {{
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: {sv['row_gap']:.1f}px;
   }}
   .rank {{
     flex: 0 0 auto;
-    width: 54px;
+    width: {sv['rank_w']:.1f}px;
     text-align: center;
     font-weight: 700;
     color: {COLOR_TEXT_MUTED};
     font-variant-numeric: tabular-nums;
   }}
   .row-top3 .rank {{
-    width: 66px;
-    font-size: 44px;
+    width: {sv['rank_top3_w']:.1f}px;
+    font-size: {sv['rank_top3_font']:.1f}px;
     color: {COLOR_TEXT_PRIMARY};
   }}
-  .row-rest .rank {{ font-size: 26px; }}
+  .row-rest .rank {{ font-size: {sv['rank_rest_font']:.1f}px; }}
   .name-block {{
     flex: 1 1 auto;
     min-width: 0;
@@ -270,23 +337,23 @@ def build_html(data):
     overflow: hidden;
     text-overflow: ellipsis;
   }}
-  .row-top3 .name {{ font-size: 40px; font-weight: 700; }}
-  .row-rest .name {{ font-size: 27px; font-weight: 700; }}
+  .row-top3 .name {{ font-size: {sv['name_top3_font']:.1f}px; font-weight: 700; }}
+  .row-rest .name {{ font-size: {sv['name_rest_font']:.1f}px; font-weight: 700; }}
   .code {{
     color: {COLOR_TEXT_MUTED};
     font-variant-numeric: tabular-nums;
     margin-left: 8px;
   }}
-  .row-top3 .code {{ font-size: 24px; }}
-  .row-rest .code {{ font-size: 18px; }}
+  .row-top3 .code {{ font-size: {sv['code_top3_font']:.1f}px; }}
+  .row-rest .code {{ font-size: {sv['code_rest_font']:.1f}px; }}
   .close {{
     flex: 0 0 auto;
     text-align: right;
     font-variant-numeric: tabular-nums;
     color: {COLOR_TEXT_SECONDARY};
   }}
-  .row-top3 .close {{ width: 130px; font-size: 32px; }}
-  .row-rest .close {{ width: 110px; font-size: 24px; }}
+  .row-top3 .close {{ width: {sv['close_top3_w']:.1f}px; font-size: {sv['close_top3_font']:.1f}px; }}
+  .row-rest .close {{ width: {sv['close_rest_w']:.1f}px; font-size: {sv['close_rest_font']:.1f}px; }}
   .chg {{
     flex: 0 0 auto;
     text-align: center;
@@ -294,8 +361,14 @@ def build_html(data):
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }}
-  .row-top3 .chg {{ width: 130px; font-size: 30px; padding: 6px 0; }}
-  .row-rest .chg {{ width: 108px; font-size: 21px; padding: 3px 0; }}
+  .row-top3 .chg {{
+    width: {sv['chg_top3_w']:.1f}px; font-size: {sv['chg_top3_font']:.1f}px;
+    padding: {sv['chg_top3_pad']:.1f}px 0;
+  }}
+  .row-rest .chg {{
+    width: {sv['chg_rest_w']:.1f}px; font-size: {sv['chg_rest_font']:.1f}px;
+    padding: {sv['chg_rest_pad']:.1f}px 0;
+  }}
   .chg-up {{ background: rgba(208,59,59,0.22); color: #ff8b8b; }}
   .chg-down {{ background: rgba(12,163,12,0.22); color: #59e05f; }}
   .chg-flat {{ background: rgba(137,135,129,0.2); color: {COLOR_TEXT_SECONDARY}; }}
@@ -306,24 +379,36 @@ def build_html(data):
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }}
-  .row-top3 .score-pill {{ width: 96px; font-size: 34px; padding: 6px 0; }}
-  .row-rest .score-pill {{ width: 78px; font-size: 22px; padding: 3px 0; }}
+  .row-top3 .score-pill {{
+    width: {sv['score_top3_w']:.1f}px; font-size: {sv['score_top3_font']:.1f}px;
+    padding: {sv['score_top3_pad']:.1f}px 0;
+  }}
+  .row-rest .score-pill {{
+    width: {sv['score_rest_w']:.1f}px; font-size: {sv['score_rest_font']:.1f}px;
+    padding: {sv['score_rest_pad']:.1f}px 0;
+  }}
   .tags {{
     display: flex;
-    gap: 8px;
-    margin-top: 6px;
-    padding-left: 70px;
+    gap: {sv['tags_gap']:.1f}px;
+    margin-top: {sv['tags_top3_margin']:.1f}px;
+    padding-left: {sv['tags_top3_padleft']:.1f}px;
   }}
-  .row-rest .tags {{ padding-left: 62px; margin-top: 2px; }}
+  .row-rest .tags {{
+    padding-left: {sv['tags_rest_padleft']:.1f}px;
+    margin-top: {sv['tags_rest_margin']:.1f}px;
+  }}
   .tag {{
     background: rgba(255,255,255,0.08);
     color: {COLOR_TEXT_SECONDARY};
     border-radius: 6px;
-    padding: 3px 10px;
+    padding: {sv['tag_pad_v']:.1f}px {sv['tag_pad_h']:.1f}px;
     white-space: nowrap;
   }}
-  .row-top3 .tag {{ font-size: 20px; }}
-  .row-rest .tag {{ font-size: 14px; padding: 1px 7px; }}
+  .row-top3 .tag {{ font-size: {sv['tag_top3_font']:.1f}px; }}
+  .row-rest .tag {{
+    font-size: {sv['tag_rest_font']:.1f}px;
+    padding: {sv['tag_rest_pad_v']:.1f}px {sv['tag_rest_pad_h']:.1f}px;
+  }}
   .footer {{
     flex: 0 0 auto;
     margin-top: 14px;
@@ -343,7 +428,7 @@ def build_html(data):
         <div class="date">{html.escape(data['report_date'])}</div>
       </div>
       <div class="subtitle">
-        通過優質門檻 <b>{data['qualified_count']}</b> 檔　進榜 <b>{data['ranked_count']}</b> 檔
+        通過優質門檻 <b>{data['qualified_count']}</b> 檔　進榜 <b>{n}</b> 檔
       </div>
     </div>
     <div class="list">
@@ -367,8 +452,7 @@ def main():
     )
     print(f"已另存：{OUTPUT_JSON}", file=sys.stderr)
 
-    html_content = build_html(data)
-    HTML_SCRATCH.write_text(html_content, encoding="utf-8")
+    n_rows = len(data["ranking"][:CARD_MAX_ROWS])
 
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=CHROMIUM_PATH)
@@ -376,8 +460,22 @@ def main():
             viewport={"width": CANVAS, "height": CANVAS},
             device_scale_factor=SCALE,
         )
+
+        # 第一階段：用 scale=1.0 畫一次，只為了量出 .list 實際可用高度
+        # （header/footer 的真實渲染高度不用猜，直接量）。
+        probe_html = build_html(data, scale=1.0)
+        HTML_SCRATCH.write_text(probe_html, encoding="utf-8")
         page.goto(f"file://{HTML_SCRATCH}")
-        page.wait_for_timeout(150)  # 讓字型完成 layout
+        page.wait_for_timeout(100)
+        list_budget = page.eval_on_selector(".list", "el => el.getBoundingClientRect().height")
+
+        scale = compute_scale(n_rows, list_budget)
+
+        # 第二階段：用量出來的精確縮放比例正式畫一次
+        final_html = build_html(data, scale=scale)
+        HTML_SCRATCH.write_text(final_html, encoding="utf-8")
+        page.goto(f"file://{HTML_SCRATCH}")
+        page.wait_for_timeout(100)
         page.screenshot(path=str(OUTPUT_PNG))
         browser.close()
 
@@ -389,7 +487,11 @@ def main():
         img = img.resize((CANVAS, CANVAS), Image.LANCZOS)
         img.save(OUTPUT_PNG)
 
-    print(f"完成：{OUTPUT_PNG}（{img.size[0]}x{img.size[1]}）", file=sys.stderr)
+    print(
+        f"完成：{OUTPUT_PNG}（{img.size[0]}x{img.size[1]}，"
+        f"畫出{n_rows}檔，量到可用高度{list_budget:.0f}px，縮放比例{scale:.2f}）",
+        file=sys.stderr,
+    )
 
 
 if __name__ == "__main__":
