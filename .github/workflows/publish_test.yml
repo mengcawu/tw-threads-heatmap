@@ -1,0 +1,44 @@
+name: Publish Threads (manual test)
+
+# 只允許在 GitHub 網頁上手動按鈕觸發，不排程、不跟著 push/PR 自動跑。
+on:
+  workflow_dispatch: {}
+
+# publish_threads.py 會 commit + push output/leaderboard_card.png，
+# 所以這個 job 需要 repo 的寫入權限（否則預設 GITHUB_TOKEN 是唯讀的）。
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          # publish_threads.py 會 push 到「目前所在分支」，這裡明確指定 main，
+          # 確保圖片是 commit 到 main，不是 workflow 預設抓到的其他分支。
+          ref: main
+          fetch-depth: 0
+          # 預設就是 true，這裡寫出來是為了明確：要保留 checkout 用的認證，
+          # 之後 `git push` 才能直接用同一組憑證推回去。
+          persist-credentials: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Configure git identity for auto-commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run publish_threads.py
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: python3 publish_threads.py
