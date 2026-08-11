@@ -86,9 +86,9 @@ RS_SCALE = 2.5  # 相對大盤 +20 個百分點 -> 滿分100；-20個百分點 -
 TOP_N = 10  # veto後倖存者取前 TOP_N 檔；不足 TOP_N 檔就全部列出，不補齊
 
 # ---- Veto 硬性排除層（四維評分算完、排序前執行；不符合任一條直接踢除，不論總分）----
-# 條件1：當日融資「增加」張數 / 前一日融資餘額 > 此比例 -> 踢除
-#   （只看增加；若前一日餘額缺資料無法算比例，這條從寬不踢）
-VETO_MARGIN_INCREASE_RATIO = 0.05
+# 條件1：當日融資「增加」張數 > 此絕對門檻（張）-> 踢除
+#   （只看增加；絕對值門檻，不用比例；若當日融資變化缺資料，這條從寬不踢）
+MARGIN_INCREASE_VETO_LOTS = 2000
 # 條件2：當日量能倍數（定義同維度3：當日成交量 / 近5日(不含當日)均量）> 此值 -> 踢除
 VETO_VOLUME_RATIO_HIGH = 2.0
 # 條件3：當日量能倍數 < 此值 -> 踢除
@@ -351,20 +351,15 @@ def check_veto(code, dates_20d, price_by_date, margin_series):
     margin_by_date = margin_series.get(code)
     if margin_by_date:
         today = dates_20d[-1]
-        prev_dates = [d for d in dates_20d if d < today]
         today_rec = margin_by_date.get(today)
-        prev_rec = margin_by_date.get(prev_dates[-1]) if prev_dates else None
-        if today_rec is not None and prev_rec is not None and prev_rec[0] > 0:
+        if today_rec is not None:
             margin_change_today = today_rec[1]
-            prev_balance = prev_rec[0]
-            ratio = margin_change_today / prev_balance
-            if ratio > VETO_MARGIN_INCREASE_RATIO:
+            if margin_change_today > MARGIN_INCREASE_VETO_LOTS:
                 reasons.append(
-                    f"融資單日增加{margin_change_today:.0f}張，"
-                    f"為前一日餘額{prev_balance:.0f}張的{ratio * 100:.1f}%"
-                    f"（>{VETO_MARGIN_INCREASE_RATIO * 100:.0f}%）"
+                    f"融資單日增加{margin_change_today:.0f}張"
+                    f"（>{MARGIN_INCREASE_VETO_LOTS}張）"
                 )
-        # 缺前一日融資餘額無法算比例 -> 從寬不踢，不加入 reasons
+        # 缺當日融資變化資料 -> 從寬不踢，不加入 reasons
 
     ratio = compute_volume_ratio(dates_20d, price_by_date)
     if ratio is not None:
@@ -483,7 +478,7 @@ def main():
             "min_avg_value_20d": MIN_AVG_VALUE_20D,
             "market_cap_threshold_ntd": MARKET_CAP_THRESHOLD,
             "market_cap_proxy_min_avg_value_20d": PROXY_MIN_AVG_VALUE_20D,
-            "veto_margin_increase_ratio": VETO_MARGIN_INCREASE_RATIO,
+            "veto_margin_increase_lots": MARGIN_INCREASE_VETO_LOTS,
             "veto_volume_ratio_high": VETO_VOLUME_RATIO_HIGH,
             "veto_volume_ratio_low": VETO_VOLUME_RATIO_LOW,
         },
