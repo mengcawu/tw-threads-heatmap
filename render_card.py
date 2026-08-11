@@ -3,13 +3,17 @@
 """
 把 score_stocks.py 的吸籌榜 JSON 輸出，畫成一張 1080x1080 的社群圖卡 PNG。
 
+視覺風格：深色金融科技數據卡片——純黑底、單一 emerald/teal 綠色主題、
+卡片式層次、精緻留白。漲跌欄位維持台股慣例（紅漲綠跌），獨立於主題綠色之外。
+資料與評分邏輯完全在 score_stocks.py，這支檔案只負責畫圖，不重算任何分數。
+
 流程：
     1. 執行 score_stocks.py，讀取其 stdout 的完整 JSON（不重新計算分數，
        單純視覺化既有結果），同時另存一份到 output/leaderboard.json 供之後發布用。
     2. 榜單（score_stocks.py 已經是 veto 後、最多 TOP_N=10 檔的最終名單）全部畫出，
        依「實際檔數」動態算列高／字級縮放比例，8檔、10檔、12檔都不裁切、不留大空白。
-       採兩階段渲染：先用預設縮放畫一次、實際量測 .list 可用高度（不用猜的常數），
-       算出精確縮放比例後再重畫一次，避免估計值誤差造成裁切或空白。
+       採兩階段渲染：先用預設縮放畫一次、實際量測榜單卡片內可用高度（不用猜的
+       常數），算出精確縮放比例後再重畫一次，避免估計值誤差造成裁切或空白。
     3. 用 Playwright + Chromium 以 2x 解析度截圖，再縮回 1080x1080，
        文字邊緣更乾淨（縮圖可讀性優先）。
 
@@ -31,81 +35,96 @@ OUTPUT_PNG = OUTPUT_DIR / "leaderboard_card.png"
 OUTPUT_JSON = OUTPUT_DIR / "leaderboard.json"
 HTML_SCRATCH = Path("/tmp/leaderboard_card_render.html")
 
-CARD_MAX_ROWS = 15  # 防禦性上限；score_stocks.py 目前 veto 後最多輸出 10 檔
+CARD_MAX_ROWS = 12  # 防禦性上限；score_stocks.py 目前 veto 後最多輸出 10 檔
 CANVAS = 1080
 SCALE = 2  # 先用 2x 截圖再縮小，字更清晰
 
-CARD_PAD_TOP = 40
-CARD_PAD_BOTTOM = 28
 # 安全係數：即使量到精確可用高度，仍只填到這個比例，留一點餘裕防止字型
 # 渲染的些微差異（sub-pixel/行高）造成裁切。
 SAFETY_FACTOR = 0.97
 
+CHROMIUM_PATH = "/opt/pw-browsers/chromium"
+
+# ============================================================
+# 色票——深色金融科技風：純黑底 + 單一 emerald/teal 主題色
+# ============================================================
+COLOR_BG = "#0a0a0a"  # 頁面底色，接近純黑
+COLOR_CARD_BG = "#161616"  # 榜單卡片底色，比頁面底色略淺，形成層次
+COLOR_CARD_BORDER = "rgba(255,255,255,0.06)"
+COLOR_TEXT_PRIMARY = "#f5f5f4"
+COLOR_TEXT_SECONDARY = "#a3a29c"
+COLOR_TEXT_MUTED = "#6b6a65"
+COLOR_HAIRLINE = "rgba(255,255,255,0.06)"
+
+# 主題綠（emerald/teal）——頂部膠囊標籤、分隔線、吸籌分色塊、chip 邊框都用這組。
+COLOR_ACCENT = "#14b8a6"  # teal-500，主題色
+COLOR_ACCENT_BRIGHT = "#5eead4"  # teal-300，分數高分端/強調用
+COLOR_ACCENT_DIM = "#0f3d38"  # 深綠，分數低分端
+COLOR_ACCENT_TINT_BG = "rgba(20,184,166,0.10)"  # chip 淡底
+COLOR_ACCENT_TINT_BORDER = "rgba(20,184,166,0.35)"  # chip 細邊
+
+# 例外：漲跌欄位維持台股慣例，紅漲綠跌，獨立於主題綠色，刻意選跟主題綠（teal，
+# 偏藍的綠）色相不同的「跌」綠（偏黃的正綠），兩者不會被誤認成同一件事。
+COLOR_UP_RED = "#f0483e"
+COLOR_UP_RED_TINT = "rgba(240,72,62,0.14)"
+COLOR_DOWN_GREEN = "#22c55e"
+COLOR_DOWN_GREEN_TINT = "rgba(34,197,94,0.14)"
+
+# 名次徽章：金／銀／銅，僅裝飾用途，不參與資料編碼。
+COLOR_MEDAL_GOLD = "#f0c419"
+COLOR_MEDAL_SILVER = "#c9ccd1"
+COLOR_MEDAL_BRONZE = "#cd8a4e"
+
+# ============================================================
 # 版面基準規格（在 N=10 檔、scale=1.0 時，是實測不裁切/不留白的版本）。
-# 檔數變動時，整組數值依 compute_scale() 算出的縮放比例一起放大/縮小，
-# 而不是只調列高：字級、內距、tag 間距全部同步縮放，維持比例協調。
+# 檔數變動時，整組數值依 compute_scale() 算出的縮放比例一起放大/縮小。
+# 「收盤/漲跌/吸籌分」三欄寬度所有列（含前三名）共用同一組，維持水平對齊；
+# 只有名次徽章與股名字級依前3名/其餘分兩級，不影響右側三欄對齊。
+# ============================================================
 BASE_SPEC = {
-    "row_top3_h": 98,
+    "row_top3_h": 96,
     "row_rest_h": 58,
-    "rank_top3_font": 44,
-    "rank_top3_w": 66,
-    "rank_rest_font": 26,
-    "rank_w": 54,
-    "name_top3_font": 40,
-    "name_rest_font": 27,
-    "code_top3_font": 24,
-    "code_rest_font": 18,
-    "close_top3_font": 32,
-    "close_top3_w": 130,
-    "close_rest_font": 24,
-    "close_rest_w": 110,
-    "chg_top3_font": 30,
-    "chg_top3_w": 130,
-    "chg_top3_pad": 6,
-    "chg_rest_font": 21,
-    "chg_rest_w": 108,
+    "dot_size": 8,
+    "dot_gap": 14,
+    "badge_col_w": 52,
+    "badge_top3_size": 44,
+    "badge_top3_font": 22,
+    "badge_rest_font": 22,
+    "name_gap": 16,
+    "name_top3_font": 34,
+    "name_rest_font": 24,
+    "code_top3_font": 19,
+    "code_rest_font": 15,
+    "col_gap": 22,
+    "close_col_w": 118,
+    "close_top3_font": 27,
+    "close_rest_font": 21,
+    "chg_col_w": 98,
+    "chg_top3_font": 21,
+    "chg_top3_pad": 5,
+    "chg_rest_font": 16,
     "chg_rest_pad": 3,
-    "score_top3_font": 34,
-    "score_top3_w": 96,
-    "score_top3_pad": 6,
-    "score_rest_font": 22,
-    "score_rest_w": 78,
+    "score_col_w": 76,
+    "score_top3_font": 23,
+    "score_top3_pad": 5,
+    "score_rest_font": 18,
     "score_rest_pad": 3,
-    "tag_top3_font": 20,
-    "tag_rest_font": 14,
-    "tag_pad_v": 3,
+    "tag_top3_font": 17,
+    "tag_rest_font": 13,
+    "tag_pad_v": 4,
     "tag_pad_h": 10,
-    "tag_rest_pad_v": 1,
-    "tag_rest_pad_h": 7,
-    "tags_top3_margin": 6,
-    "tags_rest_margin": 2,
-    "tags_top3_padleft": 70,
-    "tags_rest_padleft": 62,
-    "row_gap": 16,
+    "tag_rest_pad_v": 2,
+    "tag_rest_pad_h": 8,
+    "tags_top3_margin": 8,
+    "tags_rest_margin": 4,
     "tags_gap": 8,
 }
 # 縮放比例上下限：避免檔數極少時字放到誇張大，或極多時縮到不可讀。
-# 卡片寬度固定 1080px，不像高度能靠檔數自然分配——SCALE_MAX 刻意保守（而非跟
-# SCALE_MIN 對稱地衝到 1.6），確保就算檔數很少、垂直方向有很多空間可以放大，
-# 兩側欄位（排名/收盤/漲跌/分數色塊）+ 股名代號 加總寬度仍不會超過 1080，
-# 不然股名會被擠到觸發 ellipsis 截斷，或欄位彼此重疊。這個上限是用最壞情況
-# （3個中文字股名 + 4碼代號）反推、留了緩衝的結果，見開發過程驗證。
-SCALE_MIN = 0.75
-SCALE_MAX = 1.35
-
-CHROMIUM_PATH = "/opt/pw-browsers/chromium"
-
-# ---- 深色主題色票（取自 dataviz skill 的驗證色票，dark 模式） ----
-COLOR_SURFACE = "#1a1a19"
-COLOR_TEXT_PRIMARY = "#ffffff"
-COLOR_TEXT_SECONDARY = "#c3c2b7"
-COLOR_TEXT_MUTED = "#898781"
-COLOR_HAIRLINE = "#2c2c2a"
-COLOR_BASELINE = "#383835"
-COLOR_UP_RED = "#d03b3b"  # 台股慣例：漲＝紅（status/critical）
-COLOR_DOWN_GREEN = "#0ca30c"  # 台股慣例：跌＝綠（status/good）
-SCORE_LOW = (0x18, 0x4F, 0x95)  # 分數低：sequential blue 深色端
-SCORE_HIGH = (0x6D, 0xA7, 0xEC)  # 分數高：sequential blue 亮色端
+# 卡片寬度固定，不像高度能靠檔數自然分配——SCALE_MAX 刻意保守，確保就算檔數
+# 很少、垂直方向有很多空間可以放大，兩側固定欄位 + 股名代號 加總寬度仍不會
+# 超過卡片可用寬度，不然股名會被擠到觸發 ellipsis 截斷。
+SCALE_MIN = 0.65
+SCALE_MAX = 1.3
 
 
 def run_scoring():
@@ -140,18 +159,26 @@ def lerp(a, b, t):
     return a + (b - a) * t
 
 
+def hex_to_rgb(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))
+
+
+_SCORE_LOW_RGB = hex_to_rgb(COLOR_ACCENT_DIM)
+_SCORE_HIGH_RGB = hex_to_rgb(COLOR_ACCENT_BRIGHT)
+
+
 def score_color(score, score_min, score_max):
     # 依本次上榜檔數的實際分數區間正規化，而非固定 0~100，
-    # 讓深淺差異在分數集中的情況下仍清楚可辨。
+    # 讓深淺差異在分數集中的情況下仍清楚可辨。主題綠色深淺表現高低。
     span = score_max - score_min
     t = 0.5 if span <= 0 else (score - score_min) / span
     t = max(0.0, min(1.0, t))
-    r = round(lerp(SCORE_LOW[0], SCORE_HIGH[0], t))
-    g = round(lerp(SCORE_LOW[1], SCORE_HIGH[1], t))
-    b = round(lerp(SCORE_LOW[2], SCORE_HIGH[2], t))
-    # 相對亮度（sRGB 近似），決定分數色塊上要用白字還是深字
+    r = round(lerp(_SCORE_LOW_RGB[0], _SCORE_HIGH_RGB[0], t))
+    g = round(lerp(_SCORE_LOW_RGB[1], _SCORE_HIGH_RGB[1], t))
+    b = round(lerp(_SCORE_LOW_RGB[2], _SCORE_HIGH_RGB[2], t))
     luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-    text_color = "#0b0b0b" if luminance > 0.6 else "#ffffff"
+    text_color = "#0a0a0a" if luminance > 0.55 else "#f5f5f4"
     return f"#{r:02x}{g:02x}{b:02x}", text_color
 
 
@@ -199,13 +226,20 @@ def fmt_pct(v):
     return f"{sign}{v:.2f}%"
 
 
+MEDAL_COLORS = {1: COLOR_MEDAL_GOLD, 2: COLOR_MEDAL_SILVER, 3: COLOR_MEDAL_BRONZE}
+
+
 def build_row_html(rank, entry, score_min, score_max):
     is_top3 = rank <= 3
     tier_class = "row-top3" if is_top3 else "row-rest"
 
     chg = entry["change_pct"]
     chg_class = "chg-up" if (chg or 0) > 0 else ("chg-down" if (chg or 0) < 0 else "chg-flat")
-    score_bg, score_text_color = score_color(entry["total_score"], score_min, score_max)
+    score_bg, score_text_color = score_color(
+        entry["total_score"], score_min, score_max
+    )
+    # 狀態圓點：用分數色階（跟分數色塊同一組語彙），高分越接近主題亮綠。
+    dot_color = score_bg
     tags = build_tags(entry["dimensions"])
 
     name = html.escape(entry["name"])
@@ -213,16 +247,24 @@ def build_row_html(rank, entry, score_min, score_max):
 
     tag_html = "".join(f'<span class="tag">{html.escape(t)}</span>' for t in tags)
 
+    if is_top3:
+        badge_html = (
+            f'<div class="badge medal" style="background:{MEDAL_COLORS[rank]};">{rank}</div>'
+        )
+    else:
+        badge_html = f'<div class="badge plain">{rank}</div>'
+
     return f"""
     <div class="row {tier_class}">
       <div class="row-main">
-        <div class="rank">{rank}</div>
+        <span class="dot" style="background:{dot_color};"></span>
+        <div class="badge-col">{badge_html}</div>
         <div class="name-block">
           <span class="name">{name}</span><span class="code">{code}</span>
         </div>
         <div class="close">{fmt_close(entry['close'])}</div>
         <div class="chg {chg_class}">{fmt_pct(chg)}</div>
-        <div class="score-pill" style="background:{score_bg}; color:{score_text_color};">
+        <div class="score-block" style="background:{score_bg}; color:{score_text_color};">
           {entry['total_score']:.0f}
         </div>
       </div>
@@ -251,49 +293,95 @@ def build_html(data, scale):
   html, body {{
     width: {CANVAS}px;
     height: {CANVAS}px;
-    background: {COLOR_SURFACE};
+    background: {COLOR_BG};
     font-family: "Noto Sans CJK TC", "Noto Sans TC", sans-serif;
     color: {COLOR_TEXT_PRIMARY};
     overflow: hidden;
   }}
-  .card {{
+  .page {{
     width: {CANVAS}px;
     height: {CANVAS}px;
     display: flex;
     flex-direction: column;
-    padding: {CARD_PAD_TOP}px 44px {CARD_PAD_BOTTOM}px;
+    padding: 40px 48px 30px;
   }}
+
+  /* ---- 頂部標題區 ---- */
   .header {{
     flex: 0 0 auto;
-    padding-bottom: 18px;
-    border-bottom: 1px solid {COLOR_HAIRLINE};
-    margin-bottom: 14px;
-  }}
-  .header-top {{
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }}
-  .title {{
-    font-size: 50px;
-    font-weight: 700;
+  .pill {{
+    display: inline-block;
+    padding: 7px 24px;
+    border: 1px solid {COLOR_ACCENT};
+    border-radius: 999px;
+    color: {COLOR_ACCENT_BRIGHT};
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }}
+  .headline {{
+    margin-top: 18px;
+    font-size: 58px;
+    font-weight: 800;
     letter-spacing: 1px;
-  }}
-  .date {{
-    font-size: 28px;
-    font-weight: 500;
-    color: {COLOR_TEXT_SECONDARY};
+    color: {COLOR_TEXT_PRIMARY};
     font-variant-numeric: tabular-nums;
   }}
   .subtitle {{
-    margin-top: 8px;
-    font-size: 24px;
-    color: {COLOR_TEXT_MUTED};
+    margin-top: 10px;
+    font-size: 21px;
+    color: {COLOR_TEXT_SECONDARY};
   }}
   .subtitle b {{
-    color: {COLOR_TEXT_SECONDARY};
+    color: {COLOR_ACCENT_BRIGHT};
     font-weight: 700;
   }}
+  .divider {{
+    margin-top: 18px;
+    width: 72px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, {COLOR_ACCENT}, transparent);
+  }}
+
+  /* ---- 榜單卡片 ---- */
+  .card {{
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 20px;
+    background: {COLOR_CARD_BG};
+    border: 1px solid {COLOR_CARD_BORDER};
+    border-radius: 28px;
+    padding: 8px 30px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  }}
+  .col-header {{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: {sv['col_gap']:.1f}px;
+    padding: 10px 0 8px;
+    border-bottom: 1px solid {COLOR_HAIRLINE};
+  }}
+  .col-header .spacer {{ flex: 1 1 auto; }}
+  .col-header .label {{
+    flex: 0 0 auto;
+    text-align: right;
+    font-size: 16px;
+    color: {COLOR_TEXT_MUTED};
+    letter-spacing: 1px;
+  }}
+  .col-header .label.close {{ width: {sv['close_col_w']:.1f}px; }}
+  .col-header .label.chg {{ width: {sv['chg_col_w']:.1f}px; }}
+  .col-header .label.score {{ width: {sv['score_col_w']:.1f}px; }}
+
   .list {{
     flex: 1 1 auto;
     display: flex;
@@ -314,28 +402,50 @@ def build_html(data, scale):
   .row-main {{
     display: flex;
     align-items: center;
-    gap: {sv['row_gap']:.1f}px;
+    gap: {sv['col_gap']:.1f}px;
   }}
-  .rank {{
+
+  .dot {{
     flex: 0 0 auto;
-    width: {sv['rank_w']:.1f}px;
-    text-align: center;
+    width: {sv['dot_size']:.1f}px;
+    height: {sv['dot_size']:.1f}px;
+    border-radius: 50%;
+    margin-right: {sv['dot_gap']:.1f}px;
+  }}
+  .badge-col {{
+    flex: 0 0 auto;
+    width: {sv['badge_col_w']:.1f}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }}
+  .badge.plain {{
+    font-size: {sv['badge_rest_font']:.1f}px;
     font-weight: 700;
     color: {COLOR_TEXT_MUTED};
     font-variant-numeric: tabular-nums;
   }}
-  .row-top3 .rank {{
-    width: {sv['rank_top3_w']:.1f}px;
-    font-size: {sv['rank_top3_font']:.1f}px;
-    color: {COLOR_TEXT_PRIMARY};
+  .badge.medal {{
+    width: {sv['badge_top3_size']:.1f}px;
+    height: {sv['badge_top3_size']:.1f}px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: {sv['badge_top3_font']:.1f}px;
+    font-weight: 800;
+    color: #0a0a0a;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
   }}
-  .row-rest .rank {{ font-size: {sv['rank_rest_font']:.1f}px; }}
+
   .name-block {{
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-left: {sv['name_gap']:.1f}px;
   }}
   .row-top3 .name {{ font-size: {sv['name_top3_font']:.1f}px; font-weight: 700; }}
   .row-rest .name {{ font-size: {sv['name_rest_font']:.1f}px; font-weight: 700; }}
@@ -346,61 +456,55 @@ def build_html(data, scale):
   }}
   .row-top3 .code {{ font-size: {sv['code_top3_font']:.1f}px; }}
   .row-rest .code {{ font-size: {sv['code_rest_font']:.1f}px; }}
+
   .close {{
     flex: 0 0 auto;
+    width: {sv['close_col_w']:.1f}px;
     text-align: right;
     font-variant-numeric: tabular-nums;
     color: {COLOR_TEXT_SECONDARY};
   }}
-  .row-top3 .close {{ width: {sv['close_top3_w']:.1f}px; font-size: {sv['close_top3_font']:.1f}px; }}
-  .row-rest .close {{ width: {sv['close_rest_w']:.1f}px; font-size: {sv['close_rest_font']:.1f}px; }}
+  .row-top3 .close {{ font-size: {sv['close_top3_font']:.1f}px; }}
+  .row-rest .close {{ font-size: {sv['close_rest_font']:.1f}px; }}
+
   .chg {{
     flex: 0 0 auto;
+    width: {sv['chg_col_w']:.1f}px;
     text-align: center;
     border-radius: 8px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }}
-  .row-top3 .chg {{
-    width: {sv['chg_top3_w']:.1f}px; font-size: {sv['chg_top3_font']:.1f}px;
-    padding: {sv['chg_top3_pad']:.1f}px 0;
-  }}
-  .row-rest .chg {{
-    width: {sv['chg_rest_w']:.1f}px; font-size: {sv['chg_rest_font']:.1f}px;
-    padding: {sv['chg_rest_pad']:.1f}px 0;
-  }}
-  .chg-up {{ background: rgba(208,59,59,0.22); color: #ff8b8b; }}
-  .chg-down {{ background: rgba(12,163,12,0.22); color: #59e05f; }}
-  .chg-flat {{ background: rgba(137,135,129,0.2); color: {COLOR_TEXT_SECONDARY}; }}
-  .score-pill {{
+  .row-top3 .chg {{ font-size: {sv['chg_top3_font']:.1f}px; padding: {sv['chg_top3_pad']:.1f}px 0; }}
+  .row-rest .chg {{ font-size: {sv['chg_rest_font']:.1f}px; padding: {sv['chg_rest_pad']:.1f}px 0; }}
+  /* 台股慣例：漲＝紅、跌＝綠，獨立於主題綠色（跌用的綠色相跟主題teal刻意不同）*/
+  .chg-up {{ background: {COLOR_UP_RED_TINT}; color: {COLOR_UP_RED}; }}
+  .chg-down {{ background: {COLOR_DOWN_GREEN_TINT}; color: {COLOR_DOWN_GREEN}; }}
+  .chg-flat {{ background: rgba(255,255,255,0.06); color: {COLOR_TEXT_SECONDARY}; }}
+
+  .score-block {{
     flex: 0 0 auto;
+    width: {sv['score_col_w']:.1f}px;
     text-align: center;
-    border-radius: 10px;
-    font-weight: 700;
+    border-radius: 9px;
+    font-weight: 800;
     font-variant-numeric: tabular-nums;
   }}
-  .row-top3 .score-pill {{
-    width: {sv['score_top3_w']:.1f}px; font-size: {sv['score_top3_font']:.1f}px;
-    padding: {sv['score_top3_pad']:.1f}px 0;
-  }}
-  .row-rest .score-pill {{
-    width: {sv['score_rest_w']:.1f}px; font-size: {sv['score_rest_font']:.1f}px;
-    padding: {sv['score_rest_pad']:.1f}px 0;
-  }}
+  .row-top3 .score-block {{ font-size: {sv['score_top3_font']:.1f}px; padding: {sv['score_top3_pad']:.1f}px 0; }}
+  .row-rest .score-block {{ font-size: {sv['score_rest_font']:.1f}px; padding: {sv['score_rest_pad']:.1f}px 0; }}
+
   .tags {{
     display: flex;
     gap: {sv['tags_gap']:.1f}px;
     margin-top: {sv['tags_top3_margin']:.1f}px;
-    padding-left: {sv['tags_top3_padleft']:.1f}px;
+    padding-left: {sv['dot_size'] + sv['dot_gap'] + sv['badge_col_w'] + sv['name_gap'] + 2 * sv['col_gap']:.1f}px;
   }}
-  .row-rest .tags {{
-    padding-left: {sv['tags_rest_padleft']:.1f}px;
-    margin-top: {sv['tags_rest_margin']:.1f}px;
-  }}
+  .row-rest .tags {{ margin-top: {sv['tags_rest_margin']:.1f}px; }}
   .tag {{
-    background: rgba(255,255,255,0.08);
-    color: {COLOR_TEXT_SECONDARY};
-    border-radius: 6px;
+    background: {COLOR_ACCENT_TINT_BG};
+    border: 1px solid {COLOR_ACCENT_TINT_BORDER};
+    color: {COLOR_ACCENT_BRIGHT};
+    border-radius: 7px;
     padding: {sv['tag_pad_v']:.1f}px {sv['tag_pad_h']:.1f}px;
     white-space: nowrap;
   }}
@@ -409,33 +513,57 @@ def build_html(data, scale):
     font-size: {sv['tag_rest_font']:.1f}px;
     padding: {sv['tag_rest_pad_v']:.1f}px {sv['tag_rest_pad_h']:.1f}px;
   }}
+
+  /* ---- 底部 ---- */
   .footer {{
     flex: 0 0 auto;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid {COLOR_HAIRLINE};
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }}
+  .footer-mark {{
+    width: 46px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, {COLOR_ACCENT}, transparent);
+    margin-bottom: 10px;
+  }}
+  .footer-text {{
     text-align: center;
-    font-size: 17px;
+    font-size: 16px;
     color: {COLOR_TEXT_MUTED};
   }}
 </style>
 </head>
 <body>
-  <div class="card">
+  <div class="page">
     <div class="header">
-      <div class="header-top">
-        <div class="title">法人吸籌榜</div>
-        <div class="date">{html.escape(data['report_date'])}</div>
-      </div>
+      <div class="pill">法人吸籌榜</div>
+      <div class="headline">{html.escape(data['report_date'])}</div>
       <div class="subtitle">
         通過優質門檻 <b>{data['qualified_count']}</b> 檔　進榜 <b>{n}</b> 檔
       </div>
+      <div class="divider"></div>
     </div>
-    <div class="list">
-      {rows_html}
+
+    <div class="card">
+      <div class="col-header">
+        <div class="spacer"></div>
+        <div class="label close">收盤</div>
+        <div class="label chg">漲跌</div>
+        <div class="label score">吸籌分</div>
+      </div>
+      <div class="list">
+        {rows_html}
+      </div>
     </div>
+
     <div class="footer">
-      資料來源：TWSE公開資訊，依法人買超／融資／量價／相對強度整理，非投資建議
+      <div class="footer-mark"></div>
+      <div class="footer-text">
+        資料來源：TWSE公開資訊，依法人買超／融資／量價／相對強度整理，非投資建議
+      </div>
     </div>
   </div>
 </body>
@@ -461,8 +589,8 @@ def main():
             device_scale_factor=SCALE,
         )
 
-        # 第一階段：用 scale=1.0 畫一次，只為了量出 .list 實際可用高度
-        # （header/footer 的真實渲染高度不用猜，直接量）。
+        # 第一階段：用 scale=1.0 畫一次，只為了量出榜單卡片內 .list 實際可用高度
+        # （header/card/footer 的真實渲染高度不用猜，直接量）。
         probe_html = build_html(data, scale=1.0)
         HTML_SCRATCH.write_text(probe_html, encoding="utf-8")
         page.goto(f"file://{HTML_SCRATCH}")
