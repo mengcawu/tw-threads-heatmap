@@ -5,12 +5,12 @@
 
 流程：
     1. 執行 score_stocks.py，讀取其 stdout 的完整 JSON（不重新計算分數，
-       單純視覺化既有結果）。
-    2. 取榜單前 12 檔，組成 HTML（深色主題，沿用 dataviz skill 的驗證色票）。
+       單純視覺化既有結果），同時另存一份到 output/leaderboard.json 供之後發布用。
+    2. 取榜單前 10 檔，組成 HTML（深色主題，沿用 dataviz skill 的驗證色票）。
     3. 用 Playwright + Chromium 以 2x 解析度截圖，再縮回 1080x1080，
        文字邊緣更乾淨（縮圖可讀性優先）。
 
-輸出：output/leaderboard_card.png
+輸出：output/leaderboard_card.png、output/leaderboard.json
 """
 
 import html
@@ -25,14 +25,15 @@ from playwright.sync_api import sync_playwright
 REPO_ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = REPO_ROOT / "output"
 OUTPUT_PNG = OUTPUT_DIR / "leaderboard_card.png"
+OUTPUT_JSON = OUTPUT_DIR / "leaderboard.json"
 HTML_SCRATCH = Path("/tmp/leaderboard_card_render.html")
 
-TOP_N_CARD = 12
+TOP_N_CARD = 10
 CANVAS = 1080
 SCALE = 2  # 先用 2x 截圖再縮小，字更清晰
 
 # 版面高度預算（固定像素，避免 flex 內容撐爆導致截斷/重疊）：
-# 40(頂padding) + 128(header) + 3*ROW_TOP3 + 9*ROW_REST + 62(footer) + 28(底padding) = 1080
+# 40(頂padding) + 128(header) + 3*ROW_TOP3 + 7*ROW_REST + 62(footer) + 28(底padding) = 1080
 CARD_PAD_TOP = 40
 CARD_PAD_BOTTOM = 28
 HEADER_HEIGHT = 128
@@ -40,7 +41,7 @@ FOOTER_HEIGHT = 62
 ROW_TOP3_HEIGHT = 98
 ROW_REST_HEIGHT = 58
 _LIST_BUDGET = CANVAS - CARD_PAD_TOP - CARD_PAD_BOTTOM - HEADER_HEIGHT - FOOTER_HEIGHT
-_LIST_USED = 3 * ROW_TOP3_HEIGHT + 9 * ROW_REST_HEIGHT
+_LIST_USED = 3 * ROW_TOP3_HEIGHT + (TOP_N_CARD - 3) * ROW_REST_HEIGHT
 assert _LIST_USED <= _LIST_BUDGET, (
     f"row heights ({_LIST_USED}px) exceed available list budget ({_LIST_BUDGET}px)"
 )
@@ -230,6 +231,7 @@ def build_html(data):
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     min-height: 0;
     overflow: hidden;
   }}
@@ -359,6 +361,12 @@ def build_html(data):
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
     data = run_scoring()
+
+    OUTPUT_JSON.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print(f"已另存：{OUTPUT_JSON}", file=sys.stderr)
+
     html_content = build_html(data)
     HTML_SCRATCH.write_text(html_content, encoding="utf-8")
 

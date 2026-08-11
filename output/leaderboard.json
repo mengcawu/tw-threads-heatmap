@@ -1,0 +1,476 @@
+{
+  "report_date": "2026-08-10",
+  "qualified_count": 188,
+  "ranked_count": 15,
+  "thresholds": {
+    "lookback_days": 20,
+    "min_avg_value_20d": 200000000,
+    "market_cap_threshold_ntd": 10000000000,
+    "market_cap_proxy_min_avg_value_20d": 500000000
+  },
+  "weights": {
+    "institutional_streak": 0.35,
+    "buy_without_retail_follow": 0.3,
+    "mild_volume_uptrend": 0.2,
+    "relative_strength": 0.15
+  },
+  "notes": [
+    "全額交割/處置/注意股標記：本資料集（data/stock_day_common.csv 等）未包含此標記欄位，第一層門檻中「排除全額交割/處置/注意股」這一條略過未執行。",
+    "市值門檻：本資料集無市值欄位，改用「近20日平均成交值 ≥ 5億」作為市值≥100億門檻的代理（proxy）。",
+    "大盤近20日漲幅：data/taiex.csv 為 TWSE 官方「發行量加權股價指數」逐日收盤指數，涵蓋 data/stock_day_common.csv 出現的全部30個交易日，非估計值。",
+    "量能倍數定義：當日成交量 / 近5個交易日（不含當日）平均成交量。",
+    "近5日收盤走高定義：收盤價(最新日) > 收盤價(5個交易日前)，即近5日報酬率為正。"
+  ],
+  "ranking": [
+    {
+      "code": "3006",
+      "name": "晶豪科",
+      "total_score": 100.0,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連6日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超24333張、融資減262張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.3倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤26.2個百分點（個股26.7% vs 大盤0.4%）"
+        }
+      },
+      "close": 275.5,
+      "change_pct": 7.41,
+      "avg_value_20d": 2646079476.0
+    },
+    {
+      "code": "2408",
+      "name": "南亞科",
+      "total_score": 96.86,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連6日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超78576張、融資減421張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.0倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 79.07,
+          "fact": "強於大盤11.6個百分點（個股12.1% vs 大盤0.4%）"
+        }
+      },
+      "close": 502.0,
+      "change_pct": 9.85,
+      "avg_value_20d": 37494795129.0
+    },
+    {
+      "code": "1402",
+      "name": "遠東新",
+      "total_score": 93.43,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連20日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 99.37,
+          "fact": "法人買超41142張、融資增261張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.0倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 57.47,
+          "fact": "強於大盤3.0個百分點（個股3.4% vs 大盤0.4%）"
+        }
+      },
+      "close": 27.25,
+      "change_pct": -0.91,
+      "avg_value_20d": 559237240.0
+    },
+    {
+      "code": "2353",
+      "name": "宏碁",
+      "total_score": 92.64,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連4日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超13657張、融資減437張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.0倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 50.97,
+          "fact": "強於大盤0.4個百分點（個股0.8% vs 大盤0.4%）"
+        }
+      },
+      "close": 31.0,
+      "change_pct": 2.48,
+      "avg_value_20d": 779793528.0
+    },
+    {
+      "code": "1717",
+      "name": "長興",
+      "total_score": 92.34,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連12日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超11507張、融資減745張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.8倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 48.93,
+          "fact": "弱於大盤0.4個百分點（個股0.0% vs 大盤0.4%）"
+        }
+      },
+      "close": 70.0,
+      "change_pct": 5.74,
+      "avg_value_20d": 691978360.0
+    },
+    {
+      "code": "2354",
+      "name": "鴻準",
+      "total_score": 88.95,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連8日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 72.1,
+          "fact": "法人買超18353張、融資增5120張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.5倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 82.15,
+          "fact": "強於大盤12.9個百分點（個股13.3% vs 大盤0.4%）"
+        }
+      },
+      "close": 63.1,
+      "change_pct": 2.1,
+      "avg_value_20d": 695873455.0
+    },
+    {
+      "code": "8112",
+      "name": "至上",
+      "total_score": 87.31,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連7日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超29419張、融資減87張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 59.5,
+          "fact": "量能1.0倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 69.43,
+          "fact": "強於大盤7.8個百分點（個股8.2% vs 大盤0.4%）"
+        }
+      },
+      "close": 92.4,
+      "change_pct": 1.32,
+      "avg_value_20d": 1356711941.0
+    },
+    {
+      "code": "2027",
+      "name": "大成鋼",
+      "total_score": 87.12,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連6日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 93.98,
+          "fact": "法人買超27246張、融資增1639張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 44.6,
+          "fact": "量能0.9倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤20.5個百分點（個股21.0% vs 大盤0.4%）"
+        }
+      },
+      "close": 47.3,
+      "change_pct": 1.5,
+      "avg_value_20d": 882508601.0
+    },
+    {
+      "code": "6805",
+      "name": "富世達",
+      "total_score": 86.22,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連5日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 54.08,
+          "fact": "法人買超679張、融資增312張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.1倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤32.5個百分點（個股33.0% vs 大盤0.4%）"
+        }
+      },
+      "close": 1755.0,
+      "change_pct": 5.09,
+      "avg_value_20d": 2202077180.0
+    },
+    {
+      "code": "2609",
+      "name": "陽明",
+      "total_score": 85.04,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連5日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 88.14,
+          "fact": "法人買超5134張、融資增609張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 67.25,
+          "fact": "量能2.1倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 67.68,
+          "fact": "強於大盤7.1個百分點（個股7.5% vs 大盤0.4%）"
+        }
+      },
+      "close": 51.6,
+      "change_pct": 2.18,
+      "avg_value_20d": 869124886.0
+    },
+    {
+      "code": "2395",
+      "name": "研華",
+      "total_score": 84.24,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 60,
+          "fact": "投信連2日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 94.14,
+          "fact": "法人買超1930張、融資增113張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.2倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤25.7個百分點（個股26.1% vs 大盤0.4%）"
+        }
+      },
+      "close": 667.0,
+      "change_pct": 5.21,
+      "avg_value_20d": 2850789450.0
+    },
+    {
+      "code": "3017",
+      "name": "奇鋐",
+      "total_score": 84.0,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連8日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超5714張、融資減108張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 20,
+          "fact": "量能0.6倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤30.0個百分點（個股30.4% vs 大盤0.4%）"
+        }
+      },
+      "close": 2765.0,
+      "change_pct": -0.72,
+      "avg_value_20d": 11185713050.0
+    },
+    {
+      "code": "6781",
+      "name": "AES-KY",
+      "total_score": 83.12,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 60,
+          "fact": "外資連2日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超1664張、融資減64張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.6倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 80.77,
+          "fact": "強於大盤12.3個百分點（個股12.7% vs 大盤0.4%）"
+        }
+      },
+      "close": 1195.0,
+      "change_pct": 4.37,
+      "avg_value_20d": 914624452.0
+    },
+    {
+      "code": "3037",
+      "name": "欣興",
+      "total_score": 81.4,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連10日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超16599張、融資減1741張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 20,
+          "fact": "量能0.2倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 82.69,
+          "fact": "強於大盤13.1個百分點（個股13.5% vs 大盤0.4%）"
+        }
+      },
+      "close": 992.0,
+      "change_pct": 3.87,
+      "avg_value_20d": 23294330562.0
+    },
+    {
+      "code": "2388",
+      "name": "威盛",
+      "total_score": 80.75,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連7日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超9179張、融資減1032張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 20,
+          "fact": "量能0.6倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 78.37,
+          "fact": "強於大盤11.3個百分點（個股11.8% vs 大盤0.4%）"
+        }
+      },
+      "close": 80.7,
+      "change_pct": 3.59,
+      "avg_value_20d": 575987485.0
+    }
+  ]
+}
