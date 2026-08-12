@@ -33,7 +33,13 @@ output/ 都不在 docs/ 裡，不會被 Pages 服務到。
          a. POST /{user-id}/threads          建立媒體 container（拿 creation_id）
          b. 輪詢 GET /{creation_id}?fields=status 等 container 狀態變成
             FINISHED（官方文件建議的作法，避免 container 還沒處理完就發布失敗）
-         c. POST /{user-id}/threads_publish  用 creation_id 正式發布
+         c. 緩衝等待 PUBLISH_BUFFER_AFTER_FINISHED_SECONDS 秒——實測 status
+            變成 FINISHED 跟 Threads 後端真的能拿這個 media 發文之間還有時間差，
+            立刻發會回 code=24「The media cannot be found」
+         d. POST /{user-id}/threads_publish  用 creation_id 正式發布；如果還是
+            回 code=24，視為「media 尚未就緒」，隔幾秒重試，最多重試
+            PUBLISH_RETRY_MAX_ATTEMPTS 次、間隔遞增；其他錯誤碼不重試，
+            直接往外丟
     6. USER_ID / ACCESS_TOKEN 一律從環境變數讀（THREADS_USER_ID、
        THREADS_ACCESS_TOKEN），絕不寫進程式碼、絕不印出 token 本身。
     7. 每一步的關鍵結果（圖片URL、creation_id、發布後的 post id）印到 stdout。
@@ -79,6 +85,16 @@ PAGES_SOURCE_BRANCH = "main"
 CONTAINER_POLL_INTERVAL_SECONDS = 5
 CONTAINER_POLL_MAX_ATTEMPTS = 12  # 5秒 * 12 = 最多等 60 秒
 
+# container 輪詢到 status=FINISHED，跟 Threads 後端真的能拿這個 media 去發文
+# 之間還是觀察到有時間差：實測 FINISHED 後立刻 threads_publish 會回
+# code=24（error_subcode 4279009）"The media cannot be found"。先等一段緩衝，
+# 再加上 threads_publish 本身針對這個特定錯誤碼的重試，兩層一起處理這個
+# 時序問題。
+PUBLISH_BUFFER_AFTER_FINISHED_SECONDS = 5
+PUBLISH_MEDIA_NOT_READY_CODE = 24
+PUBLISH_RETRY_MAX_ATTEMPTS = 5  # 第一次嘗試之外，最多再重試這麼多次
+PUBLISH_RETRY_BASE_DELAY_SECONDS = 5  # 重試間隔遞增：5, 10, 15, 20, 25 秒
+
 # GitHub Pages 部署延遲：push 完不會馬上生效，建 container 前先輪詢確認圖片
 # 網址真的能公開抓到，最多等 60 秒。
 PAGES_POLL_INTERVAL_SECONDS = 5
@@ -87,6 +103,15 @@ PAGES_POLL_MAX_ATTEMPTS = 12  # 5秒 * 12 = 最多等 60 秒
 
 class PublishError(Exception):
     """任何一個發布步驟失敗時丟出，訊息裡已經包含步驟名稱與完整細節。"""
+
+
+class GraphAPIError(PublishError):
+    """Graph API 回傳明確的 error 物件時丟出，帶上結構化欄位供呼叫端判斷要不要重試。"""
+
+    def __init__(self, message, *, code=None, error_subcode=None):
+        super().__init__(message)
+        self.code = code
+        self.error_subcode = error_subcode
 
 
 def run_git(*args):
@@ -253,14 +278,16 @@ def graph_api_request(method, url, **kwargs):
 
     if resp.status_code >= 400 or "error" in data:
         err = data.get("error", {})
-        raise PublishError(
+        raise GraphAPIError(
             f"Graph API 回傳錯誤（HTTP {resp.status_code}）：{method} {url}\n"
             f"message: {err.get('message')}\n"
             f"type: {err.get('type')}\n"
             f"code: {err.get('code')}\n"
             f"error_subcode: {err.get('error_subcode')}\n"
             f"fbtrace_id: {err.get('fbtrace_id')}\n"
-            f"完整回應：{json.dumps(data, ensure_ascii=False)}"
+            f"完整回應：{json.dumps(data, ensure_ascii=False)}",
+            code=err.get("code"),
+            error_subcode=err.get("error_subcode"),
         )
     return data
 
@@ -323,6 +350,38 @@ def publish_container(user_id, access_token, creation_id):
     return post_id
 
 
+def publish_container_with_retry(user_id, access_token, creation_id):
+    """發布，遇到 code=24（media 尚未就緒）就重試；其他錯誤照常直接報錯不重試。
+
+    最多嘗試 1 + PUBLISH_RETRY_MAX_ATTEMPTS 次，重試間隔遞增
+    （PUBLISH_RETRY_BASE_DELAY_SECONDS 的 1 倍、2 倍、3 倍……）。
+    """
+    last_err = None
+    total_attempts = PUBLISH_RETRY_MAX_ATTEMPTS + 1
+    for attempt in range(1, total_attempts + 1):
+        try:
+            return publish_container(user_id, access_token, creation_id)
+        except GraphAPIError as e:
+            if e.code != PUBLISH_MEDIA_NOT_READY_CODE:
+                raise  # 不是「media 尚未就緒」這類錯誤，不重試，照常往外丟
+            last_err = e
+            if attempt < total_attempts:
+                delay = PUBLISH_RETRY_BASE_DELAY_SECONDS * attempt
+                print(
+                    f"[publish] 第{attempt}次發布回 code={e.code}"
+                    f"（error_subcode={e.error_subcode}），研判是 media 尚未就緒，"
+                    f"{delay}秒後重試（還剩{total_attempts - attempt}次機會）...",
+                    file=sys.stderr,
+                )
+                time.sleep(delay)
+    print(
+        f"[publish] 重試 {PUBLISH_RETRY_MAX_ATTEMPTS} 次後仍是 code="
+        f"{PUBLISH_MEDIA_NOT_READY_CODE}，放棄。",
+        file=sys.stderr,
+    )
+    raise last_err
+
+
 def main():
     user_id = os.environ.get("THREADS_USER_ID")
     access_token = os.environ.get("THREADS_ACCESS_TOKEN")
@@ -366,8 +425,15 @@ def main():
         print("[步驟3] 等待 container 就緒...", file=sys.stderr)
         wait_until_container_ready(creation_id, access_token)
 
+        print(
+            f"[container] status=FINISHED，緩衝等待 "
+            f"{PUBLISH_BUFFER_AFTER_FINISHED_SECONDS} 秒再發布...",
+            file=sys.stderr,
+        )
+        time.sleep(PUBLISH_BUFFER_AFTER_FINISHED_SECONDS)
+
         print("[步驟4] 正式發布...", file=sys.stderr)
-        post_id = publish_container(user_id, access_token, creation_id)
+        post_id = publish_container_with_retry(user_id, access_token, creation_id)
         print(f"[已發布 post id] {post_id}")
 
     except PublishError as e:
