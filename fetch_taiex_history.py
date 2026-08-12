@@ -152,7 +152,8 @@ def main():
         writer = csv.DictWriter(f, fieldnames=["Date", "TAIEX_Close"])
         writer.writeheader()
         writer.writerows(rows)
-    os.remove(CHECKPOINT_PATH)
+    if os.path.exists(CHECKPOINT_PATH):
+        os.remove(CHECKPOINT_PATH)
     print(f"完成，共 {len(rows)} 個交易日寫入 {OUTPUT_PATH}", file=sys.stderr, flush=True)
 
 
