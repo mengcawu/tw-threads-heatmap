@@ -92,7 +92,7 @@ def build_caption(data, n_facts):
     intro = f"今日通過優質門檻 {data['qualified_count']} 檔,依四項公開數據排序前三:"
     top = data["ranking"][:TOP_N_CAPTION]
     lines = [build_stock_line(i + 1, e, n_facts) for i, e in enumerate(top)]
-    return "\n".join([header, intro, *lines, FOOTER_TEXT, HASHTAGS])
+    return "\n".join([header, intro, *lines, "", FOOTER_TEXT, HASHTAGS])
 
 
 def check_banned_words(caption):
