@@ -1,0 +1,61 @@
+name: Daily Threads Publish
+
+on:
+  # 台灣時間週一到週五 20:00（UTC+8，所以 UTC 12:00）。
+  # 是不是交易日不是靠這個 cron 判斷的——daily_run.py 第一步會去問 TWSE
+  # 「今天有沒有資料」，遇到假日/颱風假這種 TWSE 沒收盤資料的日子，流程會
+  # 印出「非交易日，跳過」正常結束（exit 0），不會發文、不會被標記失敗。
+  schedule:
+    - cron: '0 12 * * 1-5'
+  # 保留手動觸發，方便測試（例如第一次全流程驗證，或某天想手動補跑）。
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          # daily_run.py 會 commit+push data/、output/；publish_threads.py
+          # 更進一步要求必須在 main 分支才能發布（GitHub Pages 設定成只從
+          # main 的 docs/ 部署），這裡明確鎖定 main，不管觸發當下 GITHUB_REF
+          # 是什麼。
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install requests pillow playwright
+
+      - name: Install Playwright Chromium
+        # render_card.py 用 Playwright 開無頭 Chromium 把圖卡截成 PNG，
+        # --with-deps 順便裝 Ubuntu runner 上跑無頭瀏覽器需要的系統套件
+        # （字型、共用函式庫），不然瀏覽器裝了也啟動不了。
+        run: python3 -m playwright install --with-deps chromium
+
+      - name: Install Noto Sans CJK (中文字型)
+        # render_card.py 的圖卡文字是繁體中文，runner 預設沒有 CJK 字型，
+        # 字會變成方塊/缺字。
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+
+      - name: Configure git identity for auto-commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run daily_run.py
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: python3 daily_run.py

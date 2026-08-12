@@ -22,6 +22,7 @@
 
 import html
 import json
+import os
 import re
 import subprocess
 import sys
@@ -43,7 +44,12 @@ SCALE = 2  # 先用 2x 截圖再縮小，字更清晰
 # 渲染的些微差異（sub-pixel/行高）造成裁切。
 SAFETY_FACTOR = 0.97
 
-CHROMIUM_PATH = "/opt/pw-browsers/chromium"
+# 這是目前這個開發沙盒環境預裝 Chromium 的固定路徑，不是所有環境都有——
+# 一般環境（含 GitHub Actions CI，跑 `playwright install chromium` 之後）
+# 瀏覽器會裝在 Playwright 自己的快取目錄（例如 ~/.cache/ms-playwright/...），
+# 版本號會變、路徑也不同。所以只有在這個路徑真的存在時才指定
+# executable_path；不存在就完全不指定，讓 Playwright 自己找它剛裝好的瀏覽器。
+SANDBOX_CHROMIUM_PATH = "/opt/pw-browsers/chromium"
 
 # ============================================================
 # 色票——深色金融科技風：純黑底 + 單一 emerald/teal 主題色
@@ -583,7 +589,10 @@ def main():
     n_rows = len(data["ranking"][:CARD_MAX_ROWS])
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=CHROMIUM_PATH)
+        launch_kwargs = {}
+        if os.path.exists(SANDBOX_CHROMIUM_PATH):
+            launch_kwargs["executable_path"] = SANDBOX_CHROMIUM_PATH
+        browser = p.chromium.launch(**launch_kwargs)
         page = browser.new_page(
             viewport={"width": CANVAS, "height": CANVAS},
             device_scale_factor=SCALE,

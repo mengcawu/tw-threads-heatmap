@@ -31,6 +31,7 @@ import csv
 import os
 import re
 import sys
+import time
 from datetime import datetime
 
 import requests
@@ -38,6 +39,7 @@ import requests
 OPENAPI_BASE = "https://openapi.twse.com.tw/v1"
 TIMEOUT = 30
 RETRIES = 3
+RETRY_DELAY_SEC = 2
 MAX_TRADING_DAYS = 30
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +47,10 @@ DATA_DIR = os.path.join(REPO_ROOT, "data")
 STORE_PATH = os.path.join(DATA_DIR, "stock_day_common.csv")
 
 blocked_hosts = []
+# TWSE 有回應、但資料是空的（非交易日/假日/資料尚未發布）——跟連線失敗是
+# 兩件不同的事，呼叫端（daily_run.py）要能分開處理：連線失敗是真的錯誤，
+# 空資料是「今天不用發布」的正常訊號，不該被當成失敗。
+no_data_returned = False
 
 
 def _host(url: str) -> str:
@@ -52,19 +58,23 @@ def _host(url: str) -> str:
 
 
 def fetch_stock_day_all():
+    global no_data_returned
     url = f"{OPENAPI_BASE}/exchangeReport/STOCK_DAY_ALL"
     last_err = None
-    for _ in range(RETRIES):
+    for attempt in range(RETRIES):
         try:
             resp = requests.get(url, timeout=TIMEOUT)
             resp.raise_for_status()
             data = resp.json()
             if not isinstance(data, list) or not data:
                 print(f"[錯誤] {url} 回傳空資料，可能非交易日或尚未發布。", file=sys.stderr)
+                no_data_returned = True
                 return None
             return data
         except requests.exceptions.RequestException as e:
             last_err = e
+            if attempt < RETRIES - 1:
+                time.sleep(RETRY_DELAY_SEC)
     host = _host(url)
     print(f"[錯誤] 無法連線至 {host}（{url}）：{last_err}", file=sys.stderr)
     blocked_hosts.append(host)
@@ -165,6 +175,12 @@ def merge_and_trim(existing_rows: list, new_rows: list, iso_date: str):
 def main():
     records = fetch_stock_day_all()
     if not records:
+        if no_data_returned and not blocked_hosts:
+            # exit code 2：TWSE 有回應但資料是空的（非交易日/假日/尚未發布），
+            # 跟連線失敗（exit 1）分開，讓呼叫端可以判斷「今天不用跑」而不是
+            # 「今天跑失敗了」。
+            print("[非交易日或資料未發布] TWSE 今日無資料，未寫入任何檔案。", file=sys.stderr)
+            sys.exit(2)
         if blocked_hosts:
             print(f"[被擋網域] {sorted(set(blocked_hosts))}", file=sys.stderr)
         print("[失敗] 無法取得 STOCK_DAY_ALL 資料，未寫入任何檔案。", file=sys.stderr)

@@ -197,6 +197,15 @@ def main():
         fetched_days.append(iso)
         print(f"[完成] {iso}：{len(new_rows)} 檔普通股（{len(fetched_days)}/{len(price_days)}）")
 
+    # 裁剪到跟 stock_day_common.csv 完全一樣的交易日視窗（滾動30天）：
+    # price_days 已經是 ingest_stock_day.py 裁剪過的最新30天，這裡把落在這個
+    # 視窗之外的舊資料一併丟掉，margin.csv 才不會隨著每天執行無限累積。
+    price_days_set = set(price_days)
+    dropped = len({r["Date"] for r in all_rows} - price_days_set)
+    all_rows = [r for r in all_rows if r["Date"] in price_days_set]
+    if dropped:
+        print(f"[裁剪] 移除 {dropped} 個超出目前30天視窗的舊交易日。", file=sys.stderr)
+
     write_store(all_rows)
 
     stored_days = sorted({r["Date"] for r in all_rows})

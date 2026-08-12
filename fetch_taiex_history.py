@@ -86,6 +86,20 @@ def load_checkpoint():
     return {}
 
 
+def load_existing_output():
+    """讀已經存在的 data/taiex.csv 當初始快取。
+
+    每日增量執行時，30天視窗裡通常只有「今天」是新的，其餘29天已經在
+    上次執行時抓過、存在 data/taiex.csv 裡——沒有這層快取的話，每天都要
+    重新抓整整30天，既浪費時間，也對這個已知會偶爾不穩定的歷史查詢端點
+    增加不必要的請求次數。
+    """
+    if not os.path.exists(OUTPUT_PATH):
+        return {}
+    with open(OUTPUT_PATH, newline="", encoding="utf-8") as f:
+        return {row["Date"]: float(row["TAIEX_Close"]) for row in csv.DictReader(f)}
+
+
 def save_checkpoint(results):
     with open(CHECKPOINT_PATH, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
@@ -96,9 +110,10 @@ def main():
         reader = csv.DictReader(f)
         all_dates = sorted({row["Date"] for row in reader})
 
-    results = load_checkpoint()
+    results = load_existing_output()
+    results.update(load_checkpoint())  # checkpoint 是較新的進度，蓋過舊快取
     print(
-        f"目標 {len(all_dates)} 個交易日，檢查點已有 {len(results)} 筆",
+        f"目標 {len(all_dates)} 個交易日，既有資料/檢查點已有 {len(results)} 筆",
         file=sys.stderr,
         flush=True,
     )
