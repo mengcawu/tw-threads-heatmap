@@ -14,21 +14,24 @@ output/ 都不在 docs/ 裡，不會被 Pages 服務到。
 流程：
     1. 讀 output/leaderboard_card.png、output/caption.txt（不重新產圖/重算，
        只是把既有結果發出去）。
-    2. 把圖複製一份到 docs/leaderboard_card.png（只複製這張圖，不複製別的），
-       確保 docs/.nojekyll 存在（關閉 Jekyll 建置，避免 Pages build 因為找不到
-       Jekyll 需要的結構而失敗——我們只需要純靜態檔案），commit + push。
-       強制要求目前分支是 PAGES_SOURCE_BRANCH（main）——GitHub Pages 設定成
-       只從 main 的 docs/ 部署，在別的分支跑會 push 到那個分支，但 Pages 網址
-       服務的還是 main 上的舊內容，兩邊悄悄對不上；所以分支不對直接報錯，
-       不會假裝發布成功。
-    3. 圖片網址是 https://{owner}.github.io/{repo}/leaderboard_card.png?v={sha}，
-       帶上這次 commit SHA 當 cache-busting 參數——GitHub Pages 背後的 CDN
-       會快取，同一個網址重複請求可能拿到舊圖；每次發新內容網址就換一個，
-       確保這次請求一定會打到最新部署的版本，不會誤判「HTTP 200 但其實是
-       前一次的舊圖」為成功。
+    2. 把圖以「內容雜湊」當檔名存進 docs/（例如 docs/leaderboard_card-
+       1a2b3c4d5e6f7890.png），舊版本檔案清掉只留最新這份，確保 docs/.nojekyll
+       存在（關閉 Jekyll 建置，避免 Pages build 因為找不到 Jekyll 需要的結構
+       而失敗——我們只需要純靜態檔案），commit + push。強制要求目前分支是
+       PAGES_SOURCE_BRANCH（main）——GitHub Pages 設定成只從 main 的 docs/
+       部署，在別的分支跑會 push 到那個分支，但 Pages 網址服務的還是 main 上
+       的舊內容，兩邊悄悄對不上；所以分支不對直接報錯，不會假裝發布成功。
+    3. 圖片網址是 https://{owner}.github.io/{repo}/leaderboard_card-{雜湊}.png。
+       檔名帶內容雜湊、不是固定的 leaderboard_card.png：早期版本靠
+       ?v={commit_sha} 這種 query string 當 cache-busting 參數，結果實測
+       GitHub Pages 背後的 CDN 對同一個路徑的快取不會因為 query string 不同
+       就失效——曾經真的發生「Threads 貼文文字是對的新資料，圖片卻是前一天
+       舊圖」的事故。改成內容一變、路徑就換，從根本避免同路徑不同內容的情境。
     4. Pages 部署有延遲，push 完不會馬上生效：建立 container 前先輪詢這個
-       URL，確認回應 200 且 content-type 是 image/*，最多等 60 秒；逾時就
-       直接報錯中止，不會拿一張可能還沒更新/還不存在的圖硬送給 Threads。
+       URL，確認回應 200、content-type 是 image/*，而且**抓到的內容雜湊真的
+       等於剛部署的這份**（不是只信任狀態碼，因為狀態碼可能是 CDN 快取住的
+       舊內容也回 200），最多等 120 秒；逾時就直接報錯中止，不會拿可能是舊
+       內容的圖硬送給 Threads。
     5. 用 Threads Graph API 兩步驟發布：
          a. POST /{user-id}/threads          建立媒體 container（拿 creation_id）
          b. 輪詢 GET /{creation_id}?fields=status 等 container 狀態變成
@@ -50,10 +53,9 @@ output/ 都不在 docs/ 裡，不會被 Pages 服務到。
 需要人工手動執行一次來驗證整條路徑。
 """
 
-import filecmp
+import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 import time
@@ -67,10 +69,16 @@ OUTPUT_IMAGE_PATH = REPO_ROOT / "output" / "leaderboard_card.png"
 CAPTION_PATH = REPO_ROOT / "output" / "caption.txt"
 
 DOCS_DIR = REPO_ROOT / "docs"
-DOCS_IMAGE_PATH = DOCS_DIR / "leaderboard_card.png"
 DOCS_NOJEKYLL_PATH = DOCS_DIR / ".nojekyll"
-DOCS_IMAGE_REPO_RELATIVE_PATH = "docs/leaderboard_card.png"
 DOCS_NOJEKYLL_REPO_RELATIVE_PATH = "docs/.nojekyll"
+# 檔名帶內容雜湊（不是固定的 leaderboard_card.png）：GitHub Pages 背後的 CDN
+# 實測會把同一個路徑的舊內容快取住，就算網址加 ?v=commit_sha 這種 query
+# string 當 cache-busting 參數也一樣被忽略——同一天測出來的真實案例：Threads
+# 貼文文字是對的新資料，圖片卻是前一次部署的舊圖。改成內容變了、檔名就換，
+# 從根本避免「同一個路徑、不同時間點內容不同」這種需要仰賴 CDN 正確處理
+# cache-busting 的情境。
+DOCS_IMAGE_FILENAME_PREFIX = "leaderboard_card-"
+DOCS_IMAGE_FILENAME_SUFFIX = ".png"
 
 GRAPH_API_BASE = "https://graph.threads.net/v1.0"
 HTTP_TIMEOUT = 30
@@ -96,9 +104,12 @@ PUBLISH_RETRY_MAX_ATTEMPTS = 5  # 第一次嘗試之外，最多再重試這麼�
 PUBLISH_RETRY_BASE_DELAY_SECONDS = 5  # 重試間隔遞增：5, 10, 15, 20, 25 秒
 
 # GitHub Pages 部署延遲：push 完不會馬上生效，建 container 前先輪詢確認圖片
-# 網址真的能公開抓到，最多等 60 秒。
+# 網址真的能公開抓到、內容雜湊也對得上。現在檔名本身帶內容雜湊、每次都是
+# 全新路徑，理論上不會有 CDN 快取舊內容的問題，但 Pages 本身「部署」（不是
+# CDN 快取）還是要等一下才會生效，所以保留輪詢機制，等長一點（120秒）比較
+# 保險。
 PAGES_POLL_INTERVAL_SECONDS = 5
-PAGES_POLL_MAX_ATTEMPTS = 12  # 5秒 * 12 = 最多等 60 秒
+PAGES_POLL_MAX_ATTEMPTS = 24  # 5秒 * 24 = 最多等 120 秒
 
 
 class PublishError(Exception):
@@ -158,19 +169,29 @@ def get_repo_owner_and_name():
     return owner, repo
 
 
-def build_pages_url(owner, repo, cache_bust):
-    # 帶上 commit SHA 當 query string：GitHub Pages 背後的 CDN 可能快取舊圖，
-    # 每次發新圖片網址就會不一樣，強制 CDN 對這次的網址是第一次請求（cache
-    # miss），不會抓到「HTTP 200 但其實是昨天那張圖」這種看似成功卻送錯內容
-    # 的情況。
-    return f"https://{owner}.github.io/{repo}/leaderboard_card.png?v={cache_bust}"
+def build_pages_url(owner, repo, filename):
+    return f"https://{owner}.github.io/{repo}/{filename}"
+
+
+def sha256_hex(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def is_tracked_by_git(relative_path):
+    # `git ls-files` 不會因為路徑不存在/沒被追蹤而報錯，只是回傳空字串——
+    # 用來判斷等一下要不要把這個路徑放進 `git add` 的 pathspec 清單裡。
+    return bool(run_git("ls-files", "--", relative_path))
 
 
 def sync_docs_image():
-    """把 output/leaderboard_card.png 複製進 docs/，並確保 .nojekyll 存在。
+    """把 output/leaderboard_card.png 以「內容雜湊檔名」複製進 docs/。
 
-    只動 docs/leaderboard_card.png 跟 docs/.nojekyll 這兩個檔案，不碰 docs/
+    回傳 (repo相對路徑, 完整檔名, 圖片bytes的sha256全長雜湊)。
+
+    只動 docs/leaderboard_card-*.png 這組檔案跟 docs/.nojekyll，不碰 docs/
     以外任何東西，也不會把 data/、*.py、output/ 其他檔案複製進 docs/。
+    每次都用新內容重新算檔名，並清掉 docs/ 裡其他舊的 leaderboard_card-*.png，
+    避免每天累積一個新檔案。
     """
     if not OUTPUT_IMAGE_PATH.exists():
         raise PublishError(f"找不到圖片檔案：{OUTPUT_IMAGE_PATH}")
@@ -181,17 +202,41 @@ def sync_docs_image():
         DOCS_NOJEKYLL_PATH.touch()
         print("[docs] 建立 docs/.nojekyll", file=sys.stderr)
 
-    if DOCS_IMAGE_PATH.exists() and filecmp.cmp(
-        OUTPUT_IMAGE_PATH, DOCS_IMAGE_PATH, shallow=False
-    ):
-        print("[docs] docs/leaderboard_card.png 內容已跟 output/ 一致，不覆蓋。", file=sys.stderr)
+    image_bytes = OUTPUT_IMAGE_PATH.read_bytes()
+    digest = sha256_hex(image_bytes)
+    filename = f"{DOCS_IMAGE_FILENAME_PREFIX}{digest[:16]}{DOCS_IMAGE_FILENAME_SUFFIX}"
+    docs_image_path = DOCS_DIR / filename
+
+    removed_relative_paths = []
+    for old_path in DOCS_DIR.glob(f"{DOCS_IMAGE_FILENAME_PREFIX}*{DOCS_IMAGE_FILENAME_SUFFIX}"):
+        if old_path.name == filename:
+            continue
+        relative_path = f"docs/{old_path.name}"
+        # 先判斷 git 有沒有追蹤這個檔案，再刪：如果不是（例如上一次執行在
+        # commit 之前就中斷、留下的孤兒檔案），刪掉之後就不能把它的路徑放進
+        # `git add` 的 pathspec——對一個 git 從沒認得、硬碟上也已經不存在的
+        # 路徑呼叫 `git add` 會直接報錯（pathspec did not match any files），
+        # 害這次真正要發布的新圖也一起 commit 失敗。
+        tracked = is_tracked_by_git(relative_path)
+        try:
+            old_path.unlink()
+        except OSError as e:
+            raise PublishError(f"清除舊版本 docs/{old_path.name} 失敗：{e}") from e
+        if tracked:
+            removed_relative_paths.append(relative_path)
+        print(f"[docs] 清掉舊版本：{relative_path}", file=sys.stderr)
+
+    if docs_image_path.exists() and docs_image_path.read_bytes() == image_bytes:
+        print(f"[docs] docs/{filename} 內容已跟 output/ 一致，不覆蓋。", file=sys.stderr)
     else:
-        shutil.copyfile(OUTPUT_IMAGE_PATH, DOCS_IMAGE_PATH)
-        print("[docs] 已把 output/leaderboard_card.png 複製到 docs/leaderboard_card.png", file=sys.stderr)
+        docs_image_path.write_bytes(image_bytes)
+        print(f"[docs] 已把 output/leaderboard_card.png 存成 docs/{filename}", file=sys.stderr)
+
+    return f"docs/{filename}", filename, digest, removed_relative_paths
 
 
-def commit_and_push_docs():
-    """commit + push docs/ 底下這兩個檔案（只限這兩個 pathspec），回傳 commit SHA。
+def commit_and_push_docs(new_image_relative_path, removed_relative_paths):
+    """commit + push docs/ 底下有變更的檔案（只限這些 pathspec），回傳 commit SHA。
 
     強制要求目前分支就是 PAGES_SOURCE_BRANCH（GitHub Pages 實際部署的來源分支），
     避免在別的分支跑，docs/ push 到那個分支、但 Pages 網址服務的還是 main 上
@@ -207,17 +252,18 @@ def commit_and_push_docs():
             "分支再執行。"
         )
 
-    paths = [DOCS_IMAGE_REPO_RELATIVE_PATH, DOCS_NOJEKYLL_REPO_RELATIVE_PATH]
+    paths = [new_image_relative_path, DOCS_NOJEKYLL_REPO_RELATIVE_PATH, *removed_relative_paths]
     status = run_git("status", "--porcelain", "--", *paths)
     if status:
+        # git add 對已經從硬碟刪掉的路徑會正確 stage 成「刪除」，新檔案跟
+        # .nojekyll 則正常 stage 成新增/不變；一次 commit 只帶這組 pathspec，
+        # 就算 repo 裡當下還有其他檔案被 stage 了（例如使用者手動編輯到一半、
+        # 還沒 commit 的東西），也不會被這支腳本的自動 commit 一起帶走推送。
         run_git("add", "--", *paths)
-        # commit 只帶這兩個 pathspec：就算 repo 裡當下還有其他檔案被 stage 了
-        # （例如使用者手動編輯到一半、還沒 commit 的東西），也不會被這支腳本
-        # 的自動 commit 一起帶走、一起 push 出去。
         run_git(
             "commit",
             "-m",
-            "發布用：更新 docs/leaderboard_card.png（publish_threads.py 自動 commit）",
+            f"發布用：更新 {new_image_relative_path}（publish_threads.py 自動 commit）",
             "--",
             *paths,
         )
@@ -231,16 +277,30 @@ def commit_and_push_docs():
     return commit_sha
 
 
-def wait_until_pages_ready(image_url):
-    """輪詢 Pages 圖片網址，確認 200 且 content-type 是 image/*；逾時直接報錯。"""
+def wait_until_pages_ready(image_url, expected_sha256):
+    """輪詢 Pages 圖片網址，確認 200、content-type 是 image/*、而且抓到的
+    內容雜湊真的等於我們剛部署的那份——只檢查狀態碼會被 CDN 快取住的舊內容
+    騙過去（實測發生過：HTTP 200 + image/png，但抓到的是前一天的舊圖），
+    所以一定要連內容本身都核對過才算就緒。逾時直接報錯，不送。
+    """
 
     def check(attempt):
         try:
-            resp = requests.get(image_url, timeout=HTTP_TIMEOUT, stream=True)
+            resp = requests.get(image_url, timeout=HTTP_TIMEOUT)
             content_type = resp.headers.get("Content-Type", "")
-            ready = resp.status_code == 200 and content_type.startswith("image/")
-            detail = f"HTTP {resp.status_code}, Content-Type={content_type!r}"
-            resp.close()
+            status_ok = resp.status_code == 200 and content_type.startswith("image/")
+            actual_sha256 = sha256_hex(resp.content) if status_ok else None
+            hash_ok = actual_sha256 == expected_sha256
+            ready = status_ok and hash_ok
+            if not status_ok:
+                detail = f"HTTP {resp.status_code}, Content-Type={content_type!r}"
+            elif not hash_ok:
+                detail = (
+                    f"HTTP 200 但內容雜湊對不上（拿到 {actual_sha256[:12]}…，"
+                    f"預期 {expected_sha256[:12]}…），研判是 CDN 還在吃舊快取"
+                )
+            else:
+                detail = "HTTP 200 且內容雜湊相符"
         except requests.exceptions.RequestException as e:
             ready = False
             detail = f"請求例外：{e}"
@@ -256,9 +316,9 @@ def wait_until_pages_ready(image_url):
         PAGES_POLL_INTERVAL_SECONDS,
         PAGES_POLL_MAX_ATTEMPTS,
         f"GitHub Pages 圖片網址在 {PAGES_POLL_MAX_ATTEMPTS * PAGES_POLL_INTERVAL_SECONDS} "
-        "秒內都沒有就緒，中止發布，不拿可能還沒部署好/還抓不到的圖硬送給 Threads。"
-        "可能原因：Pages 還沒在 repo Settings 裡設定成從 main /docs 部署、這是第一次"
-        f"部署還在跑（比後續更新慢）、或 docs/ 的 commit 還沒推送成功。網址：{image_url}",
+        "秒內都沒有就緒（狀態碼對或內容雜湊對不上），中止發布，不拿可能是舊內容的圖"
+        "硬送給 Threads。可能原因：Pages 還沒在 repo Settings 裡設定成從 main /docs "
+        f"部署、這是第一次部署還在跑（比後續更新慢）、或 CDN 快取還沒過期。網址：{image_url}",
     )
 
 
@@ -409,14 +469,14 @@ def main():
     try:
         owner, repo = get_repo_owner_and_name()
 
-        sync_docs_image()
-        commit_sha = commit_and_push_docs()
+        image_relative_path, image_filename, image_sha256, removed_paths = sync_docs_image()
+        commit_and_push_docs(image_relative_path, removed_paths)
 
-        image_url = build_pages_url(owner, repo, cache_bust=commit_sha[:12])
+        image_url = build_pages_url(owner, repo, image_filename)
         print(f"[圖片URL] {image_url}")
 
         print("[步驟1] 等待 GitHub Pages 部署就緒...", file=sys.stderr)
-        wait_until_pages_ready(image_url)
+        wait_until_pages_ready(image_url, image_sha256)
 
         print("[步驟2] 建立 container...", file=sys.stderr)
         creation_id = create_container(user_id, access_token, image_url, caption_text)
