@@ -38,12 +38,21 @@
                                               JSON 另存到 output/leaderboard.json，
                                               PNG 存到 output/leaderboard_card.png。
 
-    6. python3 generate_caption.py           讀 leaderboard.json，套純模板產生
+    6. python3 analyze_sector_flow.py        把「法人淨買超金額」（個股別買賣超
+                                              股數 × 收盤價估算）依 TWSE 官方
+                                              產業分類加總，排出資金流向前幾大
+                                              類股與各類股內淨買超金額最高的
+                                              個股，存到 output/sector_flow.json，
+                                              供文案的資金流向類股段落使用。
+
+    7. python3 generate_caption.py           讀 leaderboard.json／
+                                              institutional_flow.csv／
+                                              sector_flow.json，套純模板產生
                                               Threads 文案，存到 output/caption.txt。
 
-       榜單/圖卡/文案都成功後才 commit+push output/ 這三個檔案。
+       榜單/圖卡/文案都成功後才 commit+push output/ 這四個檔案。
 
-    7. python3 publish_threads.py            把 docs/leaderboard_card.png 更新、
+    8. python3 publish_threads.py            把 docs/leaderboard_card.png 更新、
                                               透過 GitHub Pages 網址＋Threads
                                               Graph API 兩步驟正式發布。
                                               THREADS_USER_ID / THREADS_ACCESS_TOKEN
@@ -73,6 +82,7 @@ DATA_PATHS = [
 OUTPUT_PATHS = [
     "output/leaderboard.json",
     "output/leaderboard_card.png",
+    "output/sector_flow.json",
     "output/caption.txt",
 ]
 
@@ -170,7 +180,12 @@ def main():
     if rc != 0:
         fail("評分 + 繪圖", rc)
 
-    # ---- 步驟 6：產生文案 ----
+    # ---- 步驟 6：資金流向類股分析 ----
+    rc = run_step("資金流向類股分析", "analyze_sector_flow.py")
+    if rc != 0:
+        fail("資金流向類股分析", rc)
+
+    # ---- 步驟 7：產生文案 ----
     rc = run_step("產生文案", "generate_caption.py")
     if rc != 0:
         fail("產生文案", rc)
@@ -181,7 +196,7 @@ def main():
         print(f"\n[中止] 榜單落地 commit 失敗：{e}", file=sys.stderr)
         sys.exit(1)
 
-    # ---- 步驟 7：發布到 Threads（含 docs/ 圖床更新，見 publish_threads.py）----
+    # ---- 步驟 8：發布到 Threads（含 docs/ 圖床更新，見 publish_threads.py）----
     rc = run_step("發布到 Threads", "publish_threads.py")
     if rc != 0:
         fail("發布到 Threads", rc)

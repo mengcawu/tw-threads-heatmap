@@ -13,9 +13,15 @@ report_date 的那一列（全市場三大法人買賣金額統計，新台幣�
 呈現。找不到對應日期（例如該腳本尚未執行過、或當天查無資料）就整段省略，
 不影響其餘文案照常產出。
 
-全長（含標點）目標控制在 150~320 字（含新增的法人資金流向段落，比只有
-排行榜時的區間更寬）：超過上限就把每檔的事實從 3 項縮為 2 項（保留法人連買、
-融資，捨量能）重新組一次。
+資金流向前幾大類股段落：讀 output/sector_flow.json（analyze_sector_flow.py
+的輸出，同樣核對 report_date 是否對得上），列出法人淨買超金額前幾大產業
+類別，各產業下再列出淨買超金額最高的幾檔個股。report_date 對不上或
+sectors 是空陣列（例如當天法人資料還沒發布、或找不到產業分類對照）就整段
+省略，不影響其餘文案照常產出。
+
+全長（含標點）目標控制在 150~450 字（含新增的法人資金流向、資金流向類股
+兩個段落，比只有排行榜時的區間更寬）：超過上限就把每檔的事實從 3 項縮為
+2 項（保留法人連買、融資，捨量能）重新組一次。
 
 硬性禁用詞檢查：完稿若命中禁用詞清單，直接報錯、不寫檔（防止未來誤改模板
 或誤植文字，混入帶有多空立場的詞彙）。
@@ -31,10 +37,11 @@ REPO_ROOT = Path(__file__).resolve().parent
 INPUT_JSON = REPO_ROOT / "output" / "leaderboard.json"
 OUTPUT_TXT = REPO_ROOT / "output" / "caption.txt"
 FLOW_CSV = REPO_ROOT / "data" / "institutional_flow.csv"
+SECTOR_FLOW_JSON = REPO_ROOT / "output" / "sector_flow.json"
 
 TOP_N_CAPTION = 3
 LENGTH_MIN = 150
-LENGTH_MAX = 320
+LENGTH_MAX = 450
 
 # 硬性禁用詞：文案含任一詞就報錯停止，防止未來誤改模板混入帶多空立場的用語。
 BANNED_WORDS = [
@@ -146,7 +153,38 @@ def build_flow_section(flow_row):
     return f"【法人資金流向】{'、'.join(parts)}{total_str}。"
 
 
-def build_caption(data, n_facts, flow_row):
+def load_sector_flow(report_date):
+    """讀 output/sector_flow.json，核對 report_date 是否對得上；對不上、
+    檔案不存在、或 sectors 是空陣列都回傳 None（呼叫端整段省略，不報錯）。
+    """
+    if not SECTOR_FLOW_JSON.exists():
+        return None
+    data = json.loads(SECTOR_FLOW_JSON.read_text(encoding="utf-8"))
+    if data.get("report_date") != report_date:
+        return None
+    return data.get("sectors") or None
+
+
+def build_sector_flow_section(sectors):
+    """資金流向前幾大類股段落；缺資料回傳 None（呼叫端整段省略）。"""
+    if not sectors:
+        return None
+
+    lines = [f"【資金流向前{len(sectors)}大類股】"]
+    for i, sec in enumerate(sectors, 1):
+        stocks = sec.get("stocks") or []
+        if not stocks:
+            continue
+        stock_names = "、".join(f"{s['name']}({s['code']})" for s in stocks)
+        amt = sec["net_buy_value_twd"] / 1e8
+        lines.append(f"{i}. {sec['sector']}（合計淨買超{amt:.1f}億元）：{stock_names}")
+
+    if len(lines) == 1:  # 只有標題、沒有任何產業列出來
+        return None
+    return "\n".join(lines)
+
+
+def build_caption(data, n_facts, flow_row, sectors):
     header = f"【法人吸籌榜 {data['report_date']}】"
     intro = f"今日通過優質門檻 {data['qualified_count']} 檔,依四項公開數據排序前三:"
     top = data["ranking"][:TOP_N_CAPTION]
@@ -156,6 +194,9 @@ def build_caption(data, n_facts, flow_row):
     flow_section = build_flow_section(flow_row)
     if flow_section:
         parts += ["", flow_section]
+    sector_section = build_sector_flow_section(sectors)
+    if sector_section:
+        parts += ["", sector_section]
     parts += ["", FOOTER_TEXT, HASHTAGS]
     return "\n".join(parts)
 
@@ -183,14 +224,22 @@ def main():
             file=sys.stderr,
         )
 
-    caption = build_caption(data, n_facts=3, flow_row=flow_row)
+    sectors = load_sector_flow(data["report_date"])
+    if not sectors:
+        print(
+            f"[警告] output/sector_flow.json 找不到 {data['report_date']} 這天的產業資料，"
+            "文案將省略資金流向類股段落。",
+            file=sys.stderr,
+        )
+
+    caption = build_caption(data, n_facts=3, flow_row=flow_row, sectors=sectors)
     if len(caption) > LENGTH_MAX:
         print(
             f"[調整] 3項事實版本 {len(caption)} 字超過 {LENGTH_MAX} 字上限，"
             "改用每檔2項事實（法人連買、融資）重組。",
             file=sys.stderr,
         )
-        caption = build_caption(data, n_facts=2, flow_row=flow_row)
+        caption = build_caption(data, n_facts=2, flow_row=flow_row, sectors=sectors)
 
     length = len(caption)
     print(f"文案長度：{length} 字（目標 {LENGTH_MIN}~{LENGTH_MAX} 字）", file=sys.stderr)
