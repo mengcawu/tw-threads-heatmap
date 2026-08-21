@@ -180,7 +180,7 @@ def margin_has_date(date_str: str) -> bool:
 
 def main():
     if already_published_today():
-        print("\n今天已經發布過（output/leaderboard.json 日期就是今天），跳過。", flush=True)
+        print("\n今天已經發布過（output/published_date.txt 日期就是今天），跳過。", flush=True)
         sys.exit(0)
 
     # ---- 步驟 1+2+3：抓量價（含交易日判斷）→ 抓法人 → 抓融資 → 抓大盤指數 ----
