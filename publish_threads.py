@@ -80,6 +80,14 @@ DOCS_NOJEKYLL_REPO_RELATIVE_PATH = "docs/.nojekyll"
 DOCS_IMAGE_FILENAME_PREFIX = "leaderboard_card-"
 DOCS_IMAGE_FILENAME_SUFFIX = ".png"
 
+# 只有 Threads 貼文真的發布成功（拿到 post_id）之後才寫入，見 mark_published()。
+# 刻意跟 output/leaderboard.json 分開：leaderboard.json 只代表「榜單算出來了」
+# （render_card.py 每次執行都會重寫，包含本機開發測試時），不能拿來當作
+# 「今天真的已經發文」的證據——daily_run.py 的 already_published_today() 判斷
+# 依據的是這個檔案，不是 leaderboard.json。
+PUBLISHED_MARKER_PATH = REPO_ROOT / "output" / "published_date.txt"
+PUBLISHED_MARKER_REPO_RELATIVE_PATH = "output/published_date.txt"
+
 GRAPH_API_BASE = "https://graph.threads.net/v1.0"
 HTTP_TIMEOUT = 30
 
@@ -275,6 +283,26 @@ def commit_and_push_docs(new_image_relative_path, removed_relative_paths):
     commit_sha = run_git("rev-parse", "HEAD")
     print(f"[git] 已推送到 origin/{branch}，commit={commit_sha}", file=sys.stderr)
     return commit_sha
+
+
+def mark_published(report_date: str):
+    """只在 threads_publish 真的成功、拿到 post_id 之後呼叫。寫入「今天已發布」
+    標記並 commit+push，供 daily_run.py 的 already_published_today() 判斷用。"""
+    PUBLISHED_MARKER_PATH.write_text(report_date, encoding="utf-8")
+    status = run_git("status", "--porcelain", "--", PUBLISHED_MARKER_REPO_RELATIVE_PATH)
+    if not status:
+        return
+    run_git("add", "--", PUBLISHED_MARKER_REPO_RELATIVE_PATH)
+    run_git(
+        "commit",
+        "-m",
+        f"發布用：標記 {report_date} 已發布（publish_threads.py 自動 commit）",
+        "--",
+        PUBLISHED_MARKER_REPO_RELATIVE_PATH,
+    )
+    branch = run_git("rev-parse", "--abbrev-ref", "HEAD")
+    run_git("push", "-u", "origin", branch)
+    print(f"[git] 已標記 {report_date} 發布完成。", file=sys.stderr)
 
 
 def wait_until_pages_ready(image_url, expected_sha256):
@@ -495,6 +523,11 @@ def main():
         print("[步驟4] 正式發布...", file=sys.stderr)
         post_id = publish_container_with_retry(user_id, access_token, creation_id)
         print(f"[已發布 post id] {post_id}")
+
+        leaderboard_data = json.loads(
+            (REPO_ROOT / "output" / "leaderboard.json").read_text(encoding="utf-8")
+        )
+        mark_published(leaderboard_data["report_date"])
 
     except PublishError as e:
         print(f"\n[發布失敗]\n{e}", file=sys.stderr)
