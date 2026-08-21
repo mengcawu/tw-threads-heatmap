@@ -71,7 +71,6 @@
 """
 
 import csv
-import json
 import subprocess
 import sys
 from datetime import datetime
@@ -155,18 +154,20 @@ def get_latest_trading_date():
 
 
 def already_published_today() -> bool:
-    """output/leaderboard.json 的 report_date 若已經是台北時間今天，代表今天
-    稍早的排程（daily.yml 晚間會重試多次）已經完整跑過一輪、發布過了，
-    這次直接跳過，避免重複發文。"""
-    path = REPO_ROOT / "output" / "leaderboard.json"
+    """output/published_date.txt 若已經是台北時間今天，代表今天稍早的排程
+    （daily.yml 晚間會重試多次）已經真的發布成功過了，這次直接跳過，避免
+    重複發文。
+
+    這個標記檔案只有 publish_threads.py 的 mark_published() 在 Threads 貼文
+    真正發布成功（拿到 post_id）之後才會寫入——刻意不看 output/leaderboard.json
+    的 report_date，因為那個檔案只代表「榜單算出來了」（render_card.py 每次
+    執行都會重寫，包含本機開發測試時），不能當作「今天真的已經發文」的證據。
+    """
+    path = REPO_ROOT / "output" / "published_date.txt"
     if not path.exists():
         return False
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return False
     today_iso = datetime.now(TAIPEI_TZ).date().isoformat()
-    return data.get("report_date") == today_iso
+    return path.read_text(encoding="utf-8").strip() == today_iso
 
 
 def margin_has_date(date_str: str) -> bool:
