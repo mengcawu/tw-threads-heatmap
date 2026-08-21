@@ -32,6 +32,13 @@
        ——就算之後（評分/繪圖/發布）失敗，今天抓到、清洗好的資料也已經落地，
        不用明天重跑一次。
 
+       融資融券（MI_MARGN）依 TWSE 官方公告是「當日晚間」公布、無固定時刻
+       （視各授信機構資料傳輸完成時間而定）。commit 完資料後，若融資融券
+       今天的資料還沒抓到，流程在這裡就停止（exit 0，不算失敗），等
+       daily.yml 排程晚間重試（見該檔案 cron 設定）；已經commit的量價／
+       法人資料下次重跑會被各腳本的「只補缺少的交易日」邏輯直接跳過，
+       不會重抓。
+
     4+5. python3 render_card.py             內部會重新執行 score_stocks.py
                                               （四維評分 + veto 排除 + 排序），
                                               讀它的 JSON 輸出畫圖卡，同時把
@@ -64,11 +71,15 @@
 """
 
 import csv
+import json
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 REPO_ROOT = Path(__file__).resolve().parent
+TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
 NON_TRADING_DAY_EXIT_CODE = 2  # 跟 ingest_stock_day.py 的 exit code 約定一致
 
@@ -143,7 +154,34 @@ def get_latest_trading_date():
     return max(dates)
 
 
+def already_published_today() -> bool:
+    """output/leaderboard.json 的 report_date 若已經是台北時間今天，代表今天
+    稍早的排程（daily.yml 晚間會重試多次）已經完整跑過一輪、發布過了，
+    這次直接跳過，避免重複發文。"""
+    path = REPO_ROOT / "output" / "leaderboard.json"
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+    today_iso = datetime.now(TAIPEI_TZ).date().isoformat()
+    return data.get("report_date") == today_iso
+
+
+def margin_has_date(date_str: str) -> bool:
+    path = REPO_ROOT / "data" / "margin.csv"
+    if not path.exists():
+        return False
+    with open(path, newline="", encoding="utf-8") as f:
+        return any(row["Date"] == date_str for row in csv.DictReader(f))
+
+
 def main():
+    if already_published_today():
+        print("\n今天已經發布過（output/leaderboard.json 日期就是今天），跳過。", flush=True)
+        sys.exit(0)
+
     # ---- 步驟 1+2+3：抓量價（含交易日判斷）→ 抓法人 → 抓融資 → 抓大盤指數 ----
     rc = run_step("抓當日量價（含交易日判斷）", "ingest_stock_day.py")
     if rc == NON_TRADING_DAY_EXIT_CODE:
@@ -174,6 +212,16 @@ def main():
     except StepError as e:
         print(f"\n[中止] 資料落地 commit 失敗：{e}", file=sys.stderr)
         sys.exit(1)
+
+    if not margin_has_date(trading_date):
+        print(
+            f"\n[今日融資融券資料尚未發布] data/margin.csv 還沒有 {trading_date} 這天的"
+            "資料（TWSE 官方公告融資融券是「當日晚間」公布、無固定時刻）。"
+            "今天已抓到的量價／法人資料已經 commit，圖卡與文案先不產生，"
+            "等 daily.yml 晚間下一次排程重試。",
+            flush=True,
+        )
+        sys.exit(0)
 
     # ---- 步驟 4+5：評分（render_card.py 內部會重跑 score_stocks.py）+ 繪圖 ----
     rc = run_step("評分 + 繪圖", "render_card.py")
