@@ -1,0 +1,73 @@
+{
+  "report_date": "2026-08-21",
+  "sectors": [
+    {
+      "sector": "半導體",
+      "net_buy_value_twd": 32603480519.0,
+      "stocks": [
+        {
+          "code": "2330",
+          "name": "台積電",
+          "net_buy_value_twd": 15510415370.0
+        },
+        {
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 3882033936.0
+        },
+        {
+          "code": "2451",
+          "name": "創見",
+          "net_buy_value_twd": 2950876250.0
+        }
+      ]
+    },
+    {
+      "sector": "金融保險",
+      "net_buy_value_twd": 8692343534.0,
+      "stocks": [
+        {
+          "code": "2881",
+          "name": "富邦金",
+          "net_buy_value_twd": 2585546080.0
+        },
+        {
+          "code": "2883",
+          "name": "凱基金",
+          "net_buy_value_twd": 1148864445.0
+        },
+        {
+          "code": "2882",
+          "name": "國泰金",
+          "net_buy_value_twd": 921728012.0
+        }
+      ]
+    },
+    {
+      "sector": "航運",
+      "net_buy_value_twd": 8615419418.0,
+      "stocks": [
+        {
+          "code": "2609",
+          "name": "陽明",
+          "net_buy_value_twd": 2614797568.0
+        },
+        {
+          "code": "2615",
+          "name": "萬海",
+          "net_buy_value_twd": 2306251570.0
+        },
+        {
+          "code": "2603",
+          "name": "長榮",
+          "net_buy_value_twd": 1941679091.0
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "「法人淨買超金額」= data/institutional.csv 當日三大法人合計買賣超股數 × data/stock_day_common.csv 當日收盤價，市場慣用近似算法，非法人實際成交均價（TWSE 未公開個股層級法人買賣金額）。",
+    "只計入當日淨買超為正的個股與產業別加總為正的產業，負值（淨賣超）不列入。",
+    "產業分類依 TWSE 官方 t187ap03_L／t187ap14_L 開放資料，對應不到中文名稱的個股或產業別代碼直接排除，不臆測。"
+  ]
+}
