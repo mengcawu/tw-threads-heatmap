@@ -4,9 +4,21 @@
 全市場上市個股日資料：清洗 + 歷史累積機制（驗證階段，先跑「當日」一天）。
 
 資料來源（TWSE 官方公開資料）：
-  https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL
+  https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=csv
       全市場上市個股當日開高低收、成交量、成交值（含普通股、ETF、ETN、
       特別股、存託憑證(DR)、受益證券等所有類型，共用一組代號系統）。
+
+      注意：這是同一份資料集在 www.twse.com.tw（網站用的即時資料）的版本，
+      不是 openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL（官方 Open Data
+      平台版本）。實測兩者發布時機不同：openapi.twse.com.tw 版本固定延遲一個
+      完整交易日（例如週五下午查詢仍只回傳週四資料，不論當天多晚查都一樣），
+      會導致每天發布的內容其實是「前一個交易日」的舊資料；這支 www.twse.com.tw
+      版本收盤（13:30）後約2小時內即可查到當日資料，兩者欄位內容相同，只是
+      發布時機不同，因此改用這支。
+
+      為避免「TWSE 有回應但其實還是舊資料」被誤判成當日新資料，fetch_stock_day_all()
+      額外核對回應內的日期是否等於台北時間今天——不是就當作「今日資料尚未發布」，
+      跟 exit code 2（非交易日）走同一條路徑，不寫入任何資料、不發布任何內容。
 
 清洗規則（只保留「普通股」）：
   先用代號規則判斷證券類型，規則是從實際資料的代號長度/前綴分布歸納出來，
@@ -28,29 +40,45 @@
 """
 
 import csv
+import io
 import os
 import re
 import sys
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 
-OPENAPI_BASE = "https://openapi.twse.com.tw/v1"
+WWW_BASE = "https://www.twse.com.tw"
 TIMEOUT = 30
 RETRIES = 3
 RETRY_DELAY_SEC = 2
 MAX_TRADING_DAYS = 30
+TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 STORE_PATH = os.path.join(DATA_DIR, "stock_day_common.csv")
 
 blocked_hosts = []
-# TWSE 有回應、但資料是空的（非交易日/假日/資料尚未發布）——跟連線失敗是
+# TWSE 有回應、但資料是空的（非交易日/假日/尚未發布）——跟連線失敗是
 # 兩件不同的事，呼叫端（daily_run.py）要能分開處理：連線失敗是真的錯誤，
 # 空資料是「今天不用發布」的正常訊號，不該被當成失敗。
 no_data_returned = False
+# TWSE 有回應、資料格式也正常，但日期不是台北時間今天（今日資料尚未發布，
+# 回應的還是上一個交易日的資料）——同樣走「今天不用發布」這條路徑，
+# 不當成資料本身有誤。
+stale_data_returned = False
+
+CSV_FIELDNAME_MAP = {
+    "日期": "Date",
+    "證券代號": "Code",
+    "證券名稱": "Name",
+    "成交股數": "TradeVolume",
+    "成交金額": "TradeValue",
+    "收盤價": "ClosingPrice",
+}
 
 
 def _host(url: str) -> str:
@@ -58,19 +86,35 @@ def _host(url: str) -> str:
 
 
 def fetch_stock_day_all():
-    global no_data_returned
-    url = f"{OPENAPI_BASE}/exchangeReport/STOCK_DAY_ALL"
+    global no_data_returned, stale_data_returned
+    url = f"{WWW_BASE}/rwd/zh/afterTrading/STOCK_DAY_ALL"
     last_err = None
     for attempt in range(RETRIES):
         try:
-            resp = requests.get(url, timeout=TIMEOUT)
+            resp = requests.get(url, params={"response": "csv"}, timeout=TIMEOUT)
             resp.raise_for_status()
-            data = resp.json()
-            if not isinstance(data, list) or not data:
+            reader = csv.DictReader(io.StringIO(resp.text))
+            rows = list(reader)
+            if not rows or "證券代號" not in (reader.fieldnames or []):
                 print(f"[錯誤] {url} 回傳空資料，可能非交易日或尚未發布。", file=sys.stderr)
                 no_data_returned = True
                 return None
-            return data
+            records = [
+                {new_key: row[old_key] for old_key, new_key in CSV_FIELDNAME_MAP.items()}
+                for row in rows
+            ]
+            fetched_iso_date = roc_to_iso(records[0]["Date"])
+            today_iso = datetime.now(TAIPEI_TZ).date().isoformat()
+            if fetched_iso_date != today_iso:
+                print(
+                    f"[尚未發布] TWSE 目前回應的最新資料是 {fetched_iso_date}，"
+                    f"不是台北時間今天（{today_iso}）：今日資料應是尚未發布，"
+                    "不當作今日資料使用。",
+                    file=sys.stderr,
+                )
+                stale_data_returned = True
+                return None
+            return records
         except requests.exceptions.RequestException as e:
             last_err = e
             if attempt < RETRIES - 1:
@@ -175,11 +219,13 @@ def merge_and_trim(existing_rows: list, new_rows: list, iso_date: str):
 def main():
     records = fetch_stock_day_all()
     if not records:
-        if no_data_returned and not blocked_hosts:
-            # exit code 2：TWSE 有回應但資料是空的（非交易日/假日/尚未發布），
-            # 跟連線失敗（exit 1）分開，讓呼叫端可以判斷「今天不用跑」而不是
-            # 「今天跑失敗了」。
-            print("[非交易日或資料未發布] TWSE 今日無資料，未寫入任何檔案。", file=sys.stderr)
+        if (no_data_returned or stale_data_returned) and not blocked_hosts:
+            # exit code 2：TWSE 有回應但資料是空的（非交易日/假日），或資料
+            # 格式正常但日期不是台北時間今天（今日資料尚未發布）——兩種情況
+            # 都跟連線失敗（exit 1）分開，讓呼叫端可以判斷「今天不用跑」而
+            # 不是「今天跑失敗了」。
+            reason = "TWSE 今日無資料（非交易日或假日）" if no_data_returned else "TWSE 今日資料尚未發布"
+            print(f"[{reason}] 未寫入任何檔案。", file=sys.stderr)
             sys.exit(2)
         if blocked_hosts:
             print(f"[被擋網域] {sorted(set(blocked_hosts))}", file=sys.stderr)

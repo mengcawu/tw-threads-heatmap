@@ -8,13 +8,20 @@
 欄位（必要時只做「取子字串」等級的擷取，例如從「法人買超X張、融資減Y張」裡
 挑出「融資減Y張」那一段），不新增任何詮釋或形容詞。
 
-全長（含標點）控制在 150~200 字：超過 200 字就把每檔的事實從 3 項縮為 2 項
-（保留法人連買、融資，捨量能）重新組一次。
+法人資金流向段落：讀 data/institutional_flow.csv 裡跟 leaderboard.json 同一個
+report_date 的那一列（全市場三大法人買賣金額統計，新台幣元），換算成「億元」
+呈現。找不到對應日期（例如該腳本尚未執行過、或當天查無資料）就整段省略，
+不影響其餘文案照常產出。
+
+全長（含標點）目標控制在 150~320 字（含新增的法人資金流向段落，比只有
+排行榜時的區間更寬）：超過上限就把每檔的事實從 3 項縮為 2 項（保留法人連買、
+融資，捨量能）重新組一次。
 
 硬性禁用詞檢查：完稿若命中禁用詞清單，直接報錯、不寫檔（防止未來誤改模板
 或誤植文字，混入帶有多空立場的詞彙）。
 """
 
+import csv
 import json
 import re
 import sys
@@ -23,10 +30,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent
 INPUT_JSON = REPO_ROOT / "output" / "leaderboard.json"
 OUTPUT_TXT = REPO_ROOT / "output" / "caption.txt"
+FLOW_CSV = REPO_ROOT / "data" / "institutional_flow.csv"
 
 TOP_N_CAPTION = 3
 LENGTH_MIN = 150
-LENGTH_MAX = 200
+LENGTH_MAX = 320
 
 # 硬性禁用詞：文案含任一詞就報錯停止，防止未來誤改模板混入帶多空立場的用語。
 BANNED_WORDS = [
@@ -87,12 +95,69 @@ def build_stock_line(rank, entry, n_facts):
     return f"{rank}. {entry['name']}({entry['code']}):{'、'.join(facts)}"
 
 
-def build_caption(data, n_facts):
+def load_flow_row(report_date):
+    """讀 data/institutional_flow.csv 裡 Date == report_date 的那一列；
+    檔案不存在或找不到對應日期就回傳 None（呼叫端整段省略，不報錯）。
+    """
+    if not FLOW_CSV.exists():
+        return None
+    with FLOW_CSV.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["Date"] == report_date:
+                return row
+    return None
+
+
+def format_100m(raw):
+    """新台幣元轉「億元」，回傳 (買超/賣超/持平, 金額絕對值) 或 None（缺資料）。"""
+    if raw in (None, ""):
+        return None
+    net = float(raw)
+    if net > 0:
+        sign = "買超"
+    elif net < 0:
+        sign = "賣超"
+    else:
+        sign = "持平"
+    return sign, abs(net) / 1e8
+
+
+def build_flow_section(flow_row):
+    """三大法人全市場買賣金額段落；缺資料回傳 None（呼叫端整段省略）。"""
+    if flow_row is None:
+        return None
+
+    parts = []
+    for label, key in [("外資", "ForeignNet"), ("投信", "TrustNet"), ("自營商", "DealerNet")]:
+        r = format_100m(flow_row.get(key))
+        if r is None:
+            continue
+        sign, amt = r
+        parts.append(f"{label}{sign}{amt:.1f}億元")
+    if not parts:
+        return None
+
+    total_str = ""
+    total = format_100m(flow_row.get("TotalNet"))
+    if total is not None:
+        sign, amt = total
+        total_str = f"，三大法人合計{sign}{amt:.1f}億元"
+
+    return f"【法人資金流向】{'、'.join(parts)}{total_str}。"
+
+
+def build_caption(data, n_facts, flow_row):
     header = f"【法人吸籌榜 {data['report_date']}】"
     intro = f"今日通過優質門檻 {data['qualified_count']} 檔,依四項公開數據排序前三:"
     top = data["ranking"][:TOP_N_CAPTION]
     lines = [build_stock_line(i + 1, e, n_facts) for i, e in enumerate(top)]
-    return "\n".join([header, intro, *lines, "", FOOTER_TEXT, HASHTAGS])
+
+    parts = [header, intro, *lines]
+    flow_section = build_flow_section(flow_row)
+    if flow_section:
+        parts += ["", flow_section]
+    parts += ["", FOOTER_TEXT, HASHTAGS]
+    return "\n".join(parts)
 
 
 def check_banned_words(caption):
@@ -110,14 +175,22 @@ def main():
             file=sys.stderr,
         )
 
-    caption = build_caption(data, n_facts=3)
+    flow_row = load_flow_row(data["report_date"])
+    if flow_row is None:
+        print(
+            f"[警告] data/institutional_flow.csv 找不到 {data['report_date']} 這天的資料，"
+            "文案將省略法人資金流向段落。",
+            file=sys.stderr,
+        )
+
+    caption = build_caption(data, n_facts=3, flow_row=flow_row)
     if len(caption) > LENGTH_MAX:
         print(
             f"[調整] 3項事實版本 {len(caption)} 字超過 {LENGTH_MAX} 字上限，"
             "改用每檔2項事實（法人連買、融資）重組。",
             file=sys.stderr,
         )
-        caption = build_caption(data, n_facts=2)
+        caption = build_caption(data, n_facts=2, flow_row=flow_row)
 
     length = len(caption)
     print(f"文案長度：{length} 字（目標 {LENGTH_MIN}~{LENGTH_MAX} 字）", file=sys.stderr)

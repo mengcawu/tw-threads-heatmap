@@ -15,14 +15,20 @@
            （exit 0）——絕不發文、不當成錯誤、不留半成品。判斷依據純粹是
            「TWSE 今天是否回傳資料」，不查任何寫死的假日表。
 
-       python3 backfill_institutional.py    抓三大法人買賣超，對齊上面的交易日
-                                              視窗，同樣裁剪維持滾動30天。
+       python3 backfill_institutional.py    抓三大法人「個股別」買賣超，對齊
+                                              上面的交易日視窗，同樣裁剪維持
+                                              滾動30天。
+       python3 backfill_institutional_flow.py
+                                              抓三大法人「全市場總額」買賣金額
+                                              統計（新台幣元，不分個股），供
+                                              文案的法人資金流向段落使用，同樣
+                                              對齊交易日視窗。
        python3 fetch_taiex_history.py       抓大盤加權指數，同樣只涵蓋這個
                                               30天視窗（會先用既有 data/taiex.csv
                                               當快取，通常只需要抓「今天」一筆
                                               新資料，不必每天重抓整個30天）。
 
-       四份 data/*.csv 都成功、且確定不是「非交易日跳過」之後，才 commit+push
+       五份 data/*.csv 都成功、且確定不是「非交易日跳過」之後，才 commit+push
        ——就算之後（評分/繪圖/發布）失敗，今天抓到、清洗好的資料也已經落地，
        不用明天重跑一次。
 
@@ -60,6 +66,7 @@ NON_TRADING_DAY_EXIT_CODE = 2  # 跟 ingest_stock_day.py 的 exit code 約定一
 DATA_PATHS = [
     "data/stock_day_common.csv",
     "data/institutional.csv",
+    "data/institutional_flow.csv",
     "data/margin.csv",
     "data/taiex.csv",
 ]
@@ -135,9 +142,13 @@ def main():
     if rc != 0:
         fail("抓當日量價", rc)
 
-    rc = run_step("抓三大法人買賣超", "backfill_institutional.py")
+    rc = run_step("抓三大法人買賣超（個股別）", "backfill_institutional.py")
     if rc != 0:
-        fail("抓三大法人買賣超", rc)
+        fail("抓三大法人買賣超（個股別）", rc)
+
+    rc = run_step("抓三大法人買賣金額（全市場總額）", "backfill_institutional_flow.py")
+    if rc != 0:
+        fail("抓三大法人買賣金額（全市場總額）", rc)
 
     rc = run_step("抓融資融券餘額", "backfill_margin.py")
     if rc != 0:
