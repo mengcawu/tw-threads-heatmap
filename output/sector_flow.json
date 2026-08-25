@@ -1,6 +1,70 @@
 {
-  "report_date": "2026-08-24",
-  "sectors": [],
+  "report_date": "2026-08-25",
+  "sectors": [
+    {
+      "sector": "電子零組件",
+      "net_buy_value_twd": 8258312084.0,
+      "stocks": [
+        {
+          "code": "3037",
+          "name": "欣興",
+          "net_buy_value_twd": 2219829990.0
+        },
+        {
+          "code": "8039",
+          "name": "台虹",
+          "net_buy_value_twd": 1475566878.0
+        },
+        {
+          "code": "2059",
+          "name": "川湖",
+          "net_buy_value_twd": 1267765180.0
+        }
+      ]
+    },
+    {
+      "sector": "金融保險",
+      "net_buy_value_twd": 7671395345.0,
+      "stocks": [
+        {
+          "code": "2881",
+          "name": "富邦金",
+          "net_buy_value_twd": 2605509401.0
+        },
+        {
+          "code": "2882",
+          "name": "國泰金",
+          "net_buy_value_twd": 1327670927.0
+        },
+        {
+          "code": "2883",
+          "name": "凱基金",
+          "net_buy_value_twd": 775522685.0
+        }
+      ]
+    },
+    {
+      "sector": "半導體",
+      "net_buy_value_twd": 6308020699.0,
+      "stocks": [
+        {
+          "code": "3443",
+          "name": "創意",
+          "net_buy_value_twd": 1444384550.0
+        },
+        {
+          "code": "2454",
+          "name": "聯發科",
+          "net_buy_value_twd": 1338937740.0
+        },
+        {
+          "code": "3034",
+          "name": "聯詠",
+          "net_buy_value_twd": 1297294740.0
+        }
+      ]
+    }
+  ],
   "notes": [
     "「法人淨買超金額」= data/institutional.csv 當日三大法人合計買賣超股數 × data/stock_day_common.csv 當日收盤價，市場慣用近似算法，非法人實際成交均價（TWSE 未公開個股層級法人買賣金額）。",
     "只計入當日淨買超為正的個股與產業別加總為正的產業，負值（淨賣超）不列入。",
