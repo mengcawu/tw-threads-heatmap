@@ -17,8 +17,21 @@
       發布時機不同，因此改用這支。
 
       為避免「TWSE 有回應但其實還是舊資料」被誤判成當日新資料，fetch_stock_day_all()
-      額外核對回應內的日期是否等於台北時間今天——不是就當作「今日資料尚未發布」，
-      跟 exit code 2（非交易日）走同一條路徑，不寫入任何資料、不發布任何內容。
+      額外核對回應內的日期是否比 data/stock_day_common.csv 目前記錄的最新日期
+      更新——不是就當作「還沒有新資料」，跟 exit code 2（非交易日）走同一條
+      路徑，不寫入任何資料、不發布任何內容。
+
+      這裡刻意拿「跟我們自己已記錄的最新日期比」，不是拿「跟台北時間今天比」：
+      GitHub Actions 的 schedule 觸發本身不保證準時，官方文件明講high load時
+      可能延遲甚至被跳過；實測發生過整晚 20:00~23:30 的排程窗口完全沒觸發、
+      只在隔天凌晨才補觸發一次的狀況——這種情況下「今天」在跑的當下其實已經
+      跨過午夜變成下一個自然日，若拿「是否等於台北時間今天」判斷，會把
+      TWSE 剛發布、貨真價實的當日資料誤判成「不是今天的舊資料」而跳過，
+      導致補跑也補不到、當天完全沒發文（實際發生過：2026-08-27 全部排程
+      窗口都沒觸發，隔天凌晨才補跑一次，資料是對的，卻因為這個比對方式被
+      誤判跳過）。改成「比自己現有的最新記錄新」就沒有這個問題：不管排程
+      延遲多久觸發，只要 TWSE 給的日期比我們已經有的還新，就是真的新資料，
+      該收就收。
 
 清洗規則（只保留「普通股」）：
   先用代號規則判斷證券類型，規則是從實際資料的代號長度/前綴分布歸納出來，
@@ -45,8 +58,6 @@ import os
 import re
 import sys
 import time
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import requests
 
@@ -55,7 +66,6 @@ TIMEOUT = 30
 RETRIES = 3
 RETRY_DELAY_SEC = 2
 MAX_TRADING_DAYS = 30
-TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(REPO_ROOT, "data")
@@ -66,8 +76,8 @@ blocked_hosts = []
 # 兩件不同的事，呼叫端（daily_run.py）要能分開處理：連線失敗是真的錯誤，
 # 空資料是「今天不用發布」的正常訊號，不該被當成失敗。
 no_data_returned = False
-# TWSE 有回應、資料格式也正常，但日期不是台北時間今天（今日資料尚未發布，
-# 回應的還是上一個交易日的資料）——同樣走「今天不用發布」這條路徑，
+# TWSE 有回應、資料格式也正常，但日期不比我們已經記錄的最新日期新
+# （還是上一次已經收過的那個交易日）——同樣走「今天不用發布」這條路徑，
 # 不當成資料本身有誤。
 stale_data_returned = False
 
@@ -85,7 +95,11 @@ def _host(url: str) -> str:
     return url.split("//", 1)[-1].split("/", 1)[0]
 
 
-def fetch_stock_day_all():
+def fetch_stock_day_all(latest_recorded_date: str = None):
+    """latest_recorded_date：data/stock_day_common.csv 目前記錄的最新日期
+    （ISO 格式），由呼叫端傳入（load_existing() 算出來的）。None 代表還沒有
+    任何歷史紀錄（第一次執行），此時不比較，直接接受 TWSE 回應的資料。
+    """
     global no_data_returned, stale_data_returned
     url = f"{WWW_BASE}/rwd/zh/afterTrading/STOCK_DAY_ALL"
     last_err = None
@@ -104,12 +118,11 @@ def fetch_stock_day_all():
                 for row in rows
             ]
             fetched_iso_date = roc_to_iso(records[0]["Date"])
-            today_iso = datetime.now(TAIPEI_TZ).date().isoformat()
-            if fetched_iso_date != today_iso:
+            if latest_recorded_date is not None and fetched_iso_date <= latest_recorded_date:
                 print(
-                    f"[尚未發布] TWSE 目前回應的最新資料是 {fetched_iso_date}，"
-                    f"不是台北時間今天（{today_iso}）：今日資料應是尚未發布，"
-                    "不當作今日資料使用。",
+                    f"[尚無新資料] TWSE 目前回應的最新資料是 {fetched_iso_date}，"
+                    f"不比我們已記錄的最新交易日（{latest_recorded_date}）新："
+                    "還沒有新的一天可以收，不當作新資料使用。",
                     file=sys.stderr,
                 )
                 stale_data_returned = True
@@ -217,14 +230,17 @@ def merge_and_trim(existing_rows: list, new_rows: list, iso_date: str):
 
 
 def main():
-    records = fetch_stock_day_all()
+    existing_rows = load_existing()
+    latest_recorded_date = max((r["Date"] for r in existing_rows), default=None)
+
+    records = fetch_stock_day_all(latest_recorded_date)
     if not records:
         if (no_data_returned or stale_data_returned) and not blocked_hosts:
             # exit code 2：TWSE 有回應但資料是空的（非交易日/假日），或資料
-            # 格式正常但日期不是台北時間今天（今日資料尚未發布）——兩種情況
-            # 都跟連線失敗（exit 1）分開，讓呼叫端可以判斷「今天不用跑」而
-            # 不是「今天跑失敗了」。
-            reason = "TWSE 今日無資料（非交易日或假日）" if no_data_returned else "TWSE 今日資料尚未發布"
+            # 格式正常但日期不比我們已記錄的最新日期新（還沒有新的一天）——
+            # 兩種情況都跟連線失敗（exit 1）分開，讓呼叫端可以判斷「今天不用
+            # 跑」而不是「今天跑失敗了」。
+            reason = "TWSE 今日無資料（非交易日或假日）" if no_data_returned else "TWSE 尚無新交易日資料"
             print(f"[{reason}] 未寫入任何檔案。", file=sys.stderr)
             sys.exit(2)
         if blocked_hosts:
@@ -254,7 +270,6 @@ def main():
         )
 
     storage_rows = to_storage_rows(common_rows, iso_date)
-    existing_rows = load_existing()
     merged_rows = merge_and_trim(existing_rows, storage_rows, iso_date)
     write_store(merged_rows)
 
