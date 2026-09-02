@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-01",
+  "report_date": "2026-09-02",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 39094410596.0,
+      "net_buy_value_twd": 7221997265.0,
       "stocks": [
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 14555324680.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 2804514541.0
         },
         {
           "code": "3189",
           "name": "景碩",
-          "net_buy_value_twd": 6449947822.0
+          "net_buy_value_twd": 738023286.0
         },
         {
-          "code": "3711",
-          "name": "日月光投控",
-          "net_buy_value_twd": 4659550880.0
-        }
-      ]
-    },
-    {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 17136392154.0,
-      "stocks": [
-        {
-          "code": "4958",
-          "name": "臻鼎-KY",
-          "net_buy_value_twd": 7060413190.0
-        },
-        {
-          "code": "2327",
-          "name": "國巨*",
-          "net_buy_value_twd": 3263635416.0
-        },
-        {
-          "code": "3037",
-          "name": "欣興",
-          "net_buy_value_twd": 2095548114.0
+          "code": "7769",
+          "name": "鴻勁",
+          "net_buy_value_twd": 529128570.0
         }
       ]
     },
     {
       "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 8497135228.0,
+      "net_buy_value_twd": 7177549590.0,
       "stocks": [
+        {
+          "code": "3231",
+          "name": "緯創",
+          "net_buy_value_twd": 2566973300.0
+        },
         {
           "code": "2357",
           "name": "華碩",
-          "net_buy_value_twd": 2663128610.0
+          "net_buy_value_twd": 1672472130.0
         },
         {
-          "code": "2382",
-          "name": "廣達",
-          "net_buy_value_twd": 1413634770.0
+          "code": "2301",
+          "name": "光寶科",
+          "net_buy_value_twd": 1408421070.0
+        }
+      ]
+    },
+    {
+      "sector": "金融保險",
+      "net_buy_value_twd": 6312850998.0,
+      "stocks": [
+        {
+          "code": "2886",
+          "name": "兆豐金",
+          "net_buy_value_twd": 999133912.0
         },
         {
-          "code": "2395",
-          "name": "研華",
-          "net_buy_value_twd": 1197141273.0
+          "code": "5880",
+          "name": "合庫金",
+          "net_buy_value_twd": 708380217.0
+        },
+        {
+          "code": "2892",
+          "name": "第一金",
+          "net_buy_value_twd": 660378212.0
         }
       ]
     }
