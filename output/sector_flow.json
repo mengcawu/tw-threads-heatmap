@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-03",
+  "report_date": "2026-09-04",
   "sectors": [
     {
-      "sector": "半導體",
-      "net_buy_value_twd": 17102534952.0,
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 28245558045.0,
       "stocks": [
         {
-          "code": "2454",
-          "name": "聯發科",
-          "net_buy_value_twd": 7324674420.0
+          "code": "3231",
+          "name": "緯創",
+          "net_buy_value_twd": 5489946792.0
         },
         {
-          "code": "2481",
-          "name": "強茂",
-          "net_buy_value_twd": 3086750316.0
+          "code": "2382",
+          "name": "廣達",
+          "net_buy_value_twd": 4541642445.0
         },
         {
-          "code": "3711",
-          "name": "日月光投控",
-          "net_buy_value_twd": 2107983291.0
-        }
-      ]
-    },
-    {
-      "sector": "金融保險",
-      "net_buy_value_twd": 7703602473.0,
-      "stocks": [
-        {
-          "code": "2885",
-          "name": "元大金",
-          "net_buy_value_twd": 1326271724.0
-        },
-        {
-          "code": "2886",
-          "name": "兆豐金",
-          "net_buy_value_twd": 1149095153.0
-        },
-        {
-          "code": "2882",
-          "name": "國泰金",
-          "net_buy_value_twd": 839499862.0
+          "code": "3017",
+          "name": "奇鋐",
+          "net_buy_value_twd": 3410278200.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 7621131932.0,
+      "net_buy_value_twd": 23932458470.0,
       "stocks": [
+        {
+          "code": "2327",
+          "name": "國巨*",
+          "net_buy_value_twd": 10534928850.0
+        },
         {
           "code": "2308",
           "name": "台達電",
-          "net_buy_value_twd": 4310284000.0
+          "net_buy_value_twd": 3275851275.0
         },
         {
-          "code": "6213",
-          "name": "聯茂",
-          "net_buy_value_twd": 1094435840.0
+          "code": "2492",
+          "name": "華新科",
+          "net_buy_value_twd": 3173032314.0
+        }
+      ]
+    },
+    {
+      "sector": "半導體",
+      "net_buy_value_twd": 17596562989.0,
+      "stocks": [
+        {
+          "code": "2330",
+          "name": "台積電",
+          "net_buy_value_twd": 4747220410.0
         },
         {
-          "code": "8039",
-          "name": "台虹",
-          "net_buy_value_twd": 468921009.0
+          "code": "2454",
+          "name": "聯發科",
+          "net_buy_value_twd": 4314148155.0
+        },
+        {
+          "code": "2303",
+          "name": "聯電",
+          "net_buy_value_twd": 3664265800.0
         }
       ]
     }
