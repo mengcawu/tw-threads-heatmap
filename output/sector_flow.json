@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-08",
+  "report_date": "2026-09-09",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 61452793362.0,
+      "net_buy_value_twd": 22021735250.0,
       "stocks": [
         {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 18576876762.0
+          "code": "3711",
+          "name": "日月光投控",
+          "net_buy_value_twd": 6043399040.0
         },
         {
-          "code": "2344",
-          "name": "華邦電",
-          "net_buy_value_twd": 18366075884.0
+          "code": "2303",
+          "name": "聯電",
+          "net_buy_value_twd": 2855462218.0
         },
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 15569380710.0
+          "code": "3189",
+          "name": "景碩",
+          "net_buy_value_twd": 1883608580.0
         }
       ]
     },
     {
-      "sector": "金融保險",
-      "net_buy_value_twd": 5868602264.0,
+      "sector": "電子零組件",
+      "net_buy_value_twd": 12947375608.0,
       "stocks": [
         {
-          "code": "2887",
-          "name": "台新新光金",
-          "net_buy_value_twd": 782062700.0
+          "code": "3037",
+          "name": "欣興",
+          "net_buy_value_twd": 4506820863.0
         },
         {
-          "code": "2884",
-          "name": "玉山金",
-          "net_buy_value_twd": 766059900.0
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 2780322450.0
         },
         {
-          "code": "2886",
-          "name": "兆豐金",
-          "net_buy_value_twd": 637283825.0
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 827418240.0
         }
       ]
     },
     {
-      "sector": "電機機械",
-      "net_buy_value_twd": 4197249814.0,
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 8263378185.0,
       "stocks": [
         {
-          "code": "3167",
-          "name": "大量",
-          "net_buy_value_twd": 4104813692.0
+          "code": "2382",
+          "name": "廣達",
+          "net_buy_value_twd": 4650464016.0
         },
         {
-          "code": "1513",
-          "name": "中興電",
-          "net_buy_value_twd": 42521985.0
+          "code": "3231",
+          "name": "緯創",
+          "net_buy_value_twd": 924343623.0
         },
         {
-          "code": "1514",
-          "name": "亞力",
-          "net_buy_value_twd": 17148852.0
+          "code": "2377",
+          "name": "微星",
+          "net_buy_value_twd": 605170632.0
         }
       ]
     }
