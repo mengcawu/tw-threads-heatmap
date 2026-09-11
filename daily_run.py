@@ -66,8 +66,28 @@
                                               直接繼承目前行程的環境變數，不在
                                               這裡碰、不印出。
 
-任何一步（除了上面明確講的「非交易日」）非 0 結束，本流程立刻停止、印出
-是哪一步失敗＋完整輸出，不繼續往下、不發布任何半成品內容。
+    9. python3 publish_instagram.py          重用 publish_threads.py 剛部署到
+                                              docs/ 的同一張圖片，透過 Meta/
+                                              Instagram Graph API 兩步驟發布到
+                                              Instagram（同一張圖、同一份文案，
+                                              等於 Threads 貼文的鏡像）。
+                                              IG_USER_ID / IG_ACCESS_TOKEN
+                                              直接繼承目前行程的環境變數，不在
+                                              這裡碰、不印出。
+                                              兩個環境變數都沒設定時（還沒申請
+                                              好 Instagram 串接），視為功能尚未
+                                              啟用，以 IG_NOT_CONFIGURED_EXIT_CODE
+                                              結束，daily_run.py 不當成失敗、
+                                              照常結束（Threads 該發的都發了）；
+                                              設定了但發布失敗，才會讓整個流程
+                                              回報失敗——此時 Threads 已經發布
+                                              成功、already_published_today()
+                                              的標記也已經寫入，不會因為 IG 這步
+                                              失敗就重複發 Threads 貼文。
+
+任何一步（除了上面明確講的「非交易日」跟「Instagram 尚未設定」）非 0 結束，
+本流程立刻停止、印出是哪一步失敗＋完整輸出，不繼續往下、不發布任何半成品
+內容。
 """
 
 import csv
@@ -81,6 +101,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
 NON_TRADING_DAY_EXIT_CODE = 2  # 跟 ingest_stock_day.py 的 exit code 約定一致
+IG_NOT_CONFIGURED_EXIT_CODE = 3  # 跟 publish_instagram.py 的 exit code 約定一致
 
 DATA_PATHS = [
     "data/stock_day_common.csv",
@@ -249,6 +270,13 @@ def main():
     rc = run_step("發布到 Threads", "publish_threads.py")
     if rc != 0:
         fail("發布到 Threads", rc)
+
+    # ---- 步驟 9：發布到 Instagram（重用 publish_threads.py 已部署的圖片）----
+    rc = run_step("發布到 Instagram", "publish_instagram.py")
+    if rc == IG_NOT_CONFIGURED_EXIT_CODE:
+        print("\nInstagram 尚未設定（IG_USER_ID／IG_ACCESS_TOKEN 未設定），跳過。", flush=True)
+    elif rc != 0:
+        fail("發布到 Instagram", rc)
 
     print(f"\n===== {trading_date} 全部完成 =====", flush=True)
 
