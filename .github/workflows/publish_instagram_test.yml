@@ -1,0 +1,46 @@
+name: Publish Instagram (manual test)
+
+# 只允許在 GitHub 網頁上手動按鈕觸發，不排程、不跟著 push/PR 自動跑。
+# 跟 publish_test.yml（Threads 手動測試）是同一個用途，只是換成 Instagram：
+# 直接用 output/leaderboard_card.png、output/caption.txt 目前的內容發文，
+# 不重新抓資料、不重新產圖，也不會經過 daily_run.py 的「今天已發布過」／
+# 「融資融券資料是否到齊」這些每日排程才需要的檢查。
+on:
+  workflow_dispatch: {}
+
+# publish_instagram.py 透過 import publish_threads 復用 sha256/GitHub Pages
+# 網址等函式，重用的是 publish_threads.py 之前已經部署到 docs/ 的圖片，
+# 不會自己 commit + push，所以理論上不需要寫入權限；保留 contents: write
+# 純粹是跟 publish_test.yml 對齊，避免之後這支腳本邏輯改動需要寫入時漏了設定。
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Configure git identity for auto-commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run publish_instagram.py
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python3 publish_instagram.py
