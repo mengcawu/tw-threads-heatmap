@@ -25,9 +25,17 @@ daily_run.py 保證這支腳本一定接在 publish_threads.py 之後執行，�
                                                      建議的作法）
     5. POST /{ig-user-id}/media_publish              用 creation_id 正式發布，
                                                      拿到貼文的 media id
-    6. IG_USER_ID / IG_ACCESS_TOKEN 一律從環境變數讀，絕不寫進程式碼、
+    6. POST /{media-id}?comment_enabled=true         實測透過 API 發布的貼文，
+                                                     留言/分享功能預設是停用的
+                                                     （推測是 Meta 對 API 發布
+                                                     內容的防洗版預設），發布
+                                                     成功後明確呼叫一次打開。
+                                                     這步失敗不影響整體結果
+                                                     （貼文已經發出去了），
+                                                     只印警告、不中止。
+    7. IG_USER_ID / IG_ACCESS_TOKEN 一律從環境變數讀，絕不寫進程式碼、
        絕不印出 token 本身。
-    7. 任何一步失敗，印出該步驟名稱＋完整錯誤訊息（含 Graph API 回傳的
+    8. 任何一步失敗，印出該步驟名稱＋完整錯誤訊息（含 Graph API 回傳的
        error/message/code/fbtrace_id），並以非 0 狀態結束，不吞掉錯誤。
 
 IG_USER_ID：Instagram「商業帳號」的數字ID（不是帳號名稱／不是粉專ID），
@@ -133,6 +141,27 @@ def publish_container(ig_user_id, access_token, creation_id):
     return media_id
 
 
+def enable_comments(media_id, access_token):
+    """發布成功後明確把留言／分享功能打開。實測透過 API 發布的貼文預設會被
+    停用留言/分享（推測是 Meta 對 API 發布內容的防洗版預設）。這步刻意不用
+    tp.graph_api_request 的例外往外丟——貼文本身已經發布成功，這只是錦上添花
+    的後續調整，失敗只印警告，不讓整個腳本回報失敗。
+    """
+    url = f"{GRAPH_API_BASE}/{media_id}"
+    try:
+        tp.graph_api_request(
+            "POST",
+            url,
+            data={"comment_enabled": "true", "access_token": access_token},
+        )
+        print("[留言功能] 已明確開啟。", file=sys.stderr)
+    except tp.PublishError as e:
+        print(
+            f"[警告] 嘗試開啟留言功能失敗（不影響貼文本身已發布成功）：\n{e}",
+            file=sys.stderr,
+        )
+
+
 def main():
     ig_user_id = os.environ.get("IG_USER_ID")
     access_token = os.environ.get("IG_ACCESS_TOKEN")
@@ -178,6 +207,8 @@ def main():
         print("[步驟4] 正式發布...", file=sys.stderr)
         media_id = publish_container(ig_user_id, access_token, creation_id)
         print(f"[已發布 media id] {media_id}")
+
+        enable_comments(media_id, access_token)
 
     except tp.PublishError as e:
         print(f"\n[發布失敗]\n{e}", file=sys.stderr)
