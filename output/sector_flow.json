@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-10",
+  "report_date": "2026-09-14",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 22692614708.0,
+      "net_buy_value_twd": 17726651915.0,
       "stocks": [
         {
           "code": "2454",
           "name": "聯發科",
-          "net_buy_value_twd": 8407089360.0
+          "net_buy_value_twd": 3885448320.0
         },
         {
-          "code": "3711",
-          "name": "日月光投控",
-          "net_buy_value_twd": 2819815050.0
+          "code": "2481",
+          "name": "強茂",
+          "net_buy_value_twd": 2721175608.0
         },
         {
-          "code": "6770",
-          "name": "力積電",
-          "net_buy_value_twd": 2218200159.0
+          "code": "2303",
+          "name": "聯電",
+          "net_buy_value_twd": 2594972595.0
+        }
+      ]
+    },
+    {
+      "sector": "電子零組件",
+      "net_buy_value_twd": 8092029964.0,
+      "stocks": [
+        {
+          "code": "2327",
+          "name": "國巨*",
+          "net_buy_value_twd": 2206457025.0
+        },
+        {
+          "code": "3037",
+          "name": "欣興",
+          "net_buy_value_twd": 1025824470.0
+        },
+        {
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 853770720.0
         }
       ]
     },
     {
       "sector": "金融保險",
-      "net_buy_value_twd": 3197642898.0,
+      "net_buy_value_twd": 5257600475.0,
       "stocks": [
+        {
+          "code": "2881",
+          "name": "富邦金",
+          "net_buy_value_twd": 845504198.0
+        },
         {
           "code": "2892",
           "name": "第一金",
-          "net_buy_value_twd": 633231848.0
+          "net_buy_value_twd": 633191673.0
         },
         {
-          "code": "2883",
-          "name": "凱基金",
-          "net_buy_value_twd": 526158437.0
-        },
-        {
-          "code": "2884",
-          "name": "玉山金",
-          "net_buy_value_twd": 377213343.0
-        }
-      ]
-    },
-    {
-      "sector": "光電",
-      "net_buy_value_twd": 2551260210.0,
-      "stocks": [
-        {
-          "code": "3008",
-          "name": "大立光",
-          "net_buy_value_twd": 1172465280.0
-        },
-        {
-          "code": "2409",
-          "name": "友達",
-          "net_buy_value_twd": 737628684.0
-        },
-        {
-          "code": "3406",
-          "name": "玉晶光",
-          "net_buy_value_twd": 515758190.0
+          "code": "2887",
+          "name": "台新新光金",
+          "net_buy_value_twd": 604334248.0
         }
       ]
     }
