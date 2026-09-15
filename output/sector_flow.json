@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-14",
+  "report_date": "2026-09-15",
   "sectors": [
     {
-      "sector": "半導體",
-      "net_buy_value_twd": 17726651915.0,
-      "stocks": [
-        {
-          "code": "2454",
-          "name": "聯發科",
-          "net_buy_value_twd": 3885448320.0
-        },
-        {
-          "code": "2481",
-          "name": "強茂",
-          "net_buy_value_twd": 2721175608.0
-        },
-        {
-          "code": "2303",
-          "name": "聯電",
-          "net_buy_value_twd": 2594972595.0
-        }
-      ]
-    },
-    {
       "sector": "電子零組件",
-      "net_buy_value_twd": 8092029964.0,
+      "net_buy_value_twd": 4694803070.0,
       "stocks": [
         {
-          "code": "2327",
-          "name": "國巨*",
-          "net_buy_value_twd": 2206457025.0
+          "code": "2308",
+          "name": "台達電",
+          "net_buy_value_twd": 1887811420.0
         },
         {
-          "code": "3037",
-          "name": "欣興",
-          "net_buy_value_twd": 1025824470.0
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 856173500.0
         },
         {
-          "code": "3653",
-          "name": "健策",
-          "net_buy_value_twd": 853770720.0
+          "code": "6805",
+          "name": "富世達",
+          "net_buy_value_twd": 426693825.0
         }
       ]
     },
     {
-      "sector": "金融保險",
-      "net_buy_value_twd": 5257600475.0,
+      "sector": "通信網路",
+      "net_buy_value_twd": 2683296321.0,
       "stocks": [
         {
-          "code": "2881",
-          "name": "富邦金",
-          "net_buy_value_twd": 845504198.0
+          "code": "2412",
+          "name": "中華電",
+          "net_buy_value_twd": 1707879313.0
         },
         {
-          "code": "2892",
-          "name": "第一金",
-          "net_buy_value_twd": 633191673.0
+          "code": "6442",
+          "name": "光聖",
+          "net_buy_value_twd": 477608470.0
         },
         {
-          "code": "2887",
-          "name": "台新新光金",
-          "net_buy_value_twd": 604334248.0
+          "code": "3045",
+          "name": "台灣大",
+          "net_buy_value_twd": 267708808.0
+        }
+      ]
+    },
+    {
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 2338597538.0,
+      "stocks": [
+        {
+          "code": "3017",
+          "name": "奇鋐",
+          "net_buy_value_twd": 1348072320.0
+        },
+        {
+          "code": "2395",
+          "name": "研華",
+          "net_buy_value_twd": 626644850.0
+        },
+        {
+          "code": "2382",
+          "name": "廣達",
+          "net_buy_value_twd": 346848804.0
         }
       ]
     }
