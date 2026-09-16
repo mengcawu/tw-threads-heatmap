@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-15",
+  "report_date": "2026-09-16",
   "sectors": [
     {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 4694803070.0,
+      "sector": "半導體",
+      "net_buy_value_twd": 26746514424.0,
       "stocks": [
         {
-          "code": "2308",
-          "name": "台達電",
-          "net_buy_value_twd": 1887811420.0
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 4007871425.0
         },
         {
-          "code": "8046",
-          "name": "南電",
-          "net_buy_value_twd": 856173500.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 3534135267.0
         },
         {
-          "code": "6805",
-          "name": "富世達",
-          "net_buy_value_twd": 426693825.0
+          "code": "2454",
+          "name": "聯發科",
+          "net_buy_value_twd": 3303013260.0
         }
       ]
     },
     {
-      "sector": "通信網路",
-      "net_buy_value_twd": 2683296321.0,
+      "sector": "金融保險",
+      "net_buy_value_twd": 4906182408.0,
       "stocks": [
         {
-          "code": "2412",
-          "name": "中華電",
-          "net_buy_value_twd": 1707879313.0
+          "code": "2891",
+          "name": "中信金",
+          "net_buy_value_twd": 916210835.0
         },
         {
-          "code": "6442",
-          "name": "光聖",
-          "net_buy_value_twd": 477608470.0
+          "code": "2887",
+          "name": "台新新光金",
+          "net_buy_value_twd": 737887196.0
         },
         {
-          "code": "3045",
-          "name": "台灣大",
-          "net_buy_value_twd": 267708808.0
+          "code": "2884",
+          "name": "玉山金",
+          "net_buy_value_twd": 670452751.0
         }
       ]
     },
     {
-      "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 2338597538.0,
+      "sector": "光電",
+      "net_buy_value_twd": 4675844716.0,
       "stocks": [
         {
-          "code": "3017",
-          "name": "奇鋐",
-          "net_buy_value_twd": 1348072320.0
+          "code": "2409",
+          "name": "友達",
+          "net_buy_value_twd": 1664365811.0
         },
         {
-          "code": "2395",
-          "name": "研華",
-          "net_buy_value_twd": 626644850.0
+          "code": "3481",
+          "name": "群創",
+          "net_buy_value_twd": 1312630434.0
         },
         {
-          "code": "2382",
-          "name": "廣達",
-          "net_buy_value_twd": 346848804.0
+          "code": "2489",
+          "name": "瑞軒",
+          "net_buy_value_twd": 262003582.0
         }
       ]
     }
