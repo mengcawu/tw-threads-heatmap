@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-21",
+  "report_date": "2026-09-22",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 44719161038.0,
+      "net_buy_value_twd": 55681794137.0,
       "stocks": [
         {
           "code": "2454",
           "name": "聯發科",
-          "net_buy_value_twd": 19120599870.0
+          "net_buy_value_twd": 10217280640.0
         },
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 10016005760.0
+          "code": "2303",
+          "name": "聯電",
+          "net_buy_value_twd": 9616641280.0
         },
         {
-          "code": "3711",
-          "name": "日月光投控",
-          "net_buy_value_twd": 4437541875.0
+          "code": "3189",
+          "name": "景碩",
+          "net_buy_value_twd": 9280744560.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 20706825330.0,
+      "net_buy_value_twd": 30873398303.0,
       "stocks": [
         {
-          "code": "2308",
-          "name": "台達電",
-          "net_buy_value_twd": 12312187500.0
-        },
-        {
-          "code": "6213",
-          "name": "聯茂",
-          "net_buy_value_twd": 3000344522.0
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 6969377170.0
         },
         {
           "code": "3037",
           "name": "欣興",
-          "net_buy_value_twd": 2096290740.0
+          "net_buy_value_twd": 6536097120.0
+        },
+        {
+          "code": "4958",
+          "name": "臻鼎-KY",
+          "net_buy_value_twd": 5499118449.0
         }
       ]
     },
     {
       "sector": "光電",
-      "net_buy_value_twd": 11619531496.0,
+      "net_buy_value_twd": 12774720698.0,
       "stocks": [
         {
           "code": "2409",
           "name": "友達",
-          "net_buy_value_twd": 8613598814.0
+          "net_buy_value_twd": 9180261250.0
         },
         {
           "code": "3481",
           "name": "群創",
-          "net_buy_value_twd": 1775843294.0
+          "net_buy_value_twd": 1345484782.0
         },
         {
-          "code": "6706",
-          "name": "惠特",
-          "net_buy_value_twd": 425093084.0
+          "code": "6278",
+          "name": "台表科",
+          "net_buy_value_twd": 771992515.0
         }
       ]
     }
