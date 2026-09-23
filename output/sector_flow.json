@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-22",
+  "report_date": "2026-09-23",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 55681794137.0,
+      "net_buy_value_twd": 51579576283.0,
       "stocks": [
         {
-          "code": "2454",
-          "name": "聯發科",
-          "net_buy_value_twd": 10217280640.0
+          "code": "2330",
+          "name": "台積電",
+          "net_buy_value_twd": 15761807500.0
         },
         {
-          "code": "2303",
-          "name": "聯電",
-          "net_buy_value_twd": 9616641280.0
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 15247863530.0
         },
         {
-          "code": "3189",
-          "name": "景碩",
-          "net_buy_value_twd": 9280744560.0
+          "code": "3443",
+          "name": "創意",
+          "net_buy_value_twd": 3533472540.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 30873398303.0,
+      "net_buy_value_twd": 16072118692.0,
       "stocks": [
-        {
-          "code": "8046",
-          "name": "南電",
-          "net_buy_value_twd": 6969377170.0
-        },
         {
           "code": "3037",
           "name": "欣興",
-          "net_buy_value_twd": 6536097120.0
+          "net_buy_value_twd": 6530369640.0
         },
         {
-          "code": "4958",
-          "name": "臻鼎-KY",
-          "net_buy_value_twd": 5499118449.0
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 4600547050.0
+        },
+        {
+          "code": "6805",
+          "name": "富世達",
+          "net_buy_value_twd": 1229085000.0
         }
       ]
     },
     {
-      "sector": "光電",
-      "net_buy_value_twd": 12774720698.0,
+      "sector": "其他電子",
+      "net_buy_value_twd": 5469239583.0,
       "stocks": [
         {
-          "code": "2409",
-          "name": "友達",
-          "net_buy_value_twd": 9180261250.0
+          "code": "2404",
+          "name": "漢唐",
+          "net_buy_value_twd": 2480625000.0
         },
         {
-          "code": "3481",
-          "name": "群創",
-          "net_buy_value_twd": 1345484782.0
+          "code": "2317",
+          "name": "鴻海",
+          "net_buy_value_twd": 1990070016.0
         },
         {
-          "code": "6278",
-          "name": "台表科",
-          "net_buy_value_twd": 771992515.0
+          "code": "8021",
+          "name": "尖點",
+          "net_buy_value_twd": 304797656.0
         }
       ]
     }
