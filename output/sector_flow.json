@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-23",
+  "report_date": "2026-09-24",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 51579576283.0,
+      "net_buy_value_twd": 17490779132.0,
       "stocks": [
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 15761807500.0
+          "code": "3189",
+          "name": "景碩",
+          "net_buy_value_twd": 8018706748.0
         },
         {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 15247863530.0
+          "code": "2454",
+          "name": "聯發科",
+          "net_buy_value_twd": 3544956030.0
         },
         {
-          "code": "3443",
-          "name": "創意",
-          "net_buy_value_twd": 3533472540.0
+          "code": "8150",
+          "name": "南茂",
+          "net_buy_value_twd": 1555140944.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 16072118692.0,
+      "net_buy_value_twd": 13282517090.0,
       "stocks": [
+        {
+          "code": "3026",
+          "name": "禾伸堂",
+          "net_buy_value_twd": 2508364260.0
+        },
         {
           "code": "3037",
           "name": "欣興",
-          "net_buy_value_twd": 6530369640.0
+          "net_buy_value_twd": 2149204875.0
         },
         {
           "code": "8046",
           "name": "南電",
-          "net_buy_value_twd": 4600547050.0
-        },
-        {
-          "code": "6805",
-          "name": "富世達",
-          "net_buy_value_twd": 1229085000.0
+          "net_buy_value_twd": 1891829560.0
         }
       ]
     },
     {
-      "sector": "其他電子",
-      "net_buy_value_twd": 5469239583.0,
+      "sector": "塑膠",
+      "net_buy_value_twd": 3566250573.0,
       "stocks": [
         {
-          "code": "2404",
-          "name": "漢唐",
-          "net_buy_value_twd": 2480625000.0
+          "code": "1303",
+          "name": "南亞",
+          "net_buy_value_twd": 3389072876.0
         },
         {
-          "code": "2317",
-          "name": "鴻海",
-          "net_buy_value_twd": 1990070016.0
+          "code": "1301",
+          "name": "台塑",
+          "net_buy_value_twd": 125236977.0
         },
         {
-          "code": "8021",
-          "name": "尖點",
-          "net_buy_value_twd": 304797656.0
+          "code": "1326",
+          "name": "台化",
+          "net_buy_value_twd": 29556447.0
         }
       ]
     }
