@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-09-29",
+  "report_date": "2026-09-30",
   "sectors": [
     {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 11119649401.0,
-      "stocks": [
-        {
-          "code": "4958",
-          "name": "臻鼎-KY",
-          "net_buy_value_twd": 6620549587.0
-        },
-        {
-          "code": "8046",
-          "name": "南電",
-          "net_buy_value_twd": 1924561810.0
-        },
-        {
-          "code": "2059",
-          "name": "川湖",
-          "net_buy_value_twd": 734847440.0
-        }
-      ]
-    },
-    {
       "sector": "半導體",
-      "net_buy_value_twd": 9192402453.0,
+      "net_buy_value_twd": 35646163855.0,
       "stocks": [
         {
-          "code": "3189",
-          "name": "景碩",
-          "net_buy_value_twd": 1281662525.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 7004848746.0
+        },
+        {
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 6499129752.0
         },
         {
           "code": "6770",
           "name": "力積電",
-          "net_buy_value_twd": 1126053774.0
-        },
-        {
-          "code": "2344",
-          "name": "華邦電",
-          "net_buy_value_twd": 1053742608.0
+          "net_buy_value_twd": 4653281119.0
         }
       ]
     },
     {
-      "sector": "塑膠",
-      "net_buy_value_twd": 8413222189.0,
+      "sector": "光電",
+      "net_buy_value_twd": 10923829601.0,
       "stocks": [
         {
-          "code": "1303",
-          "name": "南亞",
-          "net_buy_value_twd": 8353948538.0
+          "code": "3481",
+          "name": "群創",
+          "net_buy_value_twd": 5813524916.0
         },
         {
-          "code": "1301",
-          "name": "台塑",
-          "net_buy_value_twd": 51056610.0
+          "code": "2409",
+          "name": "友達",
+          "net_buy_value_twd": 2734014612.0
         },
         {
-          "code": "1307",
-          "name": "三芳",
-          "net_buy_value_twd": 5291947.0
+          "code": "6456",
+          "name": "GIS-KY",
+          "net_buy_value_twd": 503658876.0
+        }
+      ]
+    },
+    {
+      "sector": "電子零組件",
+      "net_buy_value_twd": 6744776831.0,
+      "stocks": [
+        {
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 1978948180.0
+        },
+        {
+          "code": "2308",
+          "name": "台達電",
+          "net_buy_value_twd": 1824556860.0
+        },
+        {
+          "code": "3037",
+          "name": "欣興",
+          "net_buy_value_twd": 839301325.0
         }
       ]
     }
