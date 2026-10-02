@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-10-01",
+  "report_date": "2026-10-02",
   "sectors": [
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 34469499176.0,
+      "net_buy_value_twd": 31867442382.0,
       "stocks": [
         {
-          "code": "2327",
-          "name": "國巨*",
-          "net_buy_value_twd": 15843449846.0
+          "code": "4958",
+          "name": "臻鼎-KY",
+          "net_buy_value_twd": 10470362628.0
+        },
+        {
+          "code": "3037",
+          "name": "欣興",
+          "net_buy_value_twd": 7884850455.0
         },
         {
           "code": "2492",
           "name": "華新科",
-          "net_buy_value_twd": 5846820210.0
-        },
-        {
-          "code": "8046",
-          "name": "南電",
-          "net_buy_value_twd": 4757445880.0
+          "net_buy_value_twd": 4582725740.0
         }
       ]
     },
     {
       "sector": "半導體",
-      "net_buy_value_twd": 29660768139.0,
+      "net_buy_value_twd": 19111531948.0,
       "stocks": [
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 10767167080.0
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 4592256150.0
         },
         {
-          "code": "2303",
-          "name": "聯電",
-          "net_buy_value_twd": 4800360108.0
+          "code": "6770",
+          "name": "力積電",
+          "net_buy_value_twd": 3817084010.0
         },
         {
           "code": "3189",
           "name": "景碩",
-          "net_buy_value_twd": 3196865130.0
+          "net_buy_value_twd": 1311644250.0
         }
       ]
     },
     {
-      "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 8649305575.0,
+      "sector": "光電",
+      "net_buy_value_twd": 6328986357.0,
       "stocks": [
         {
-          "code": "3231",
-          "name": "緯創",
-          "net_buy_value_twd": 5835875870.0
+          "code": "2409",
+          "name": "友達",
+          "net_buy_value_twd": 3692648504.0
         },
         {
-          "code": "2357",
-          "name": "華碩",
-          "net_buy_value_twd": 595545890.0
+          "code": "3714",
+          "name": "富采",
+          "net_buy_value_twd": 823945124.0
         },
         {
-          "code": "3706",
-          "name": "神達",
-          "net_buy_value_twd": 412448479.0
+          "code": "3673",
+          "name": "TPK-KY",
+          "net_buy_value_twd": 310523429.0
         }
       ]
     }
