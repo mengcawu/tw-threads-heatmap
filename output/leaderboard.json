@@ -1,7 +1,7 @@
 {
-  "report_date": "2026-10-06",
-  "qualified_count": 180,
-  "vetoed_count": 92,
+  "report_date": "2026-10-07",
+  "qualified_count": 178,
+  "vetoed_count": 82,
   "ranked_count": 10,
   "thresholds": {
     "lookback_days": 20,
@@ -27,562 +27,502 @@
   ],
   "vetoed": [
     {
-      "code": "8150",
-      "name": "南茂",
-      "reason": "近5日融資累計增加6342張（>3000張）",
-      "total_score": 89.42
-    },
-    {
-      "code": "3044",
-      "name": "健鼎",
-      "reason": "量能2.1倍（>2.0倍）",
-      "total_score": 89.13
-    },
-    {
-      "code": "1560",
-      "name": "中砂",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 84.0
+      "code": "6278",
+      "name": "台表科",
+      "reason": "量能2.2倍（>2.0倍）",
+      "total_score": 85.8
     },
     {
       "code": "3189",
       "name": "景碩",
-      "reason": "量能0.4倍（<0.7倍）",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 84.0
+    },
+    {
+      "code": "6196",
+      "name": "帆宣",
+      "reason": "量能0.5倍（<0.7倍）",
       "total_score": 84.0
     },
     {
       "code": "8046",
       "name": "南電",
-      "reason": "量能0.5倍（<0.7倍）",
+      "reason": "量能0.7倍（<0.7倍）",
       "total_score": 84.0
     },
     {
-      "code": "6257",
-      "name": "矽格",
-      "reason": "量能2.8倍（>2.0倍）",
-      "total_score": 81.02
-    },
-    {
-      "code": "6672",
-      "name": "騰輝電子-KY",
-      "reason": "量能0.2倍（<0.7倍）",
-      "total_score": 80.64
-    },
-    {
-      "code": "6239",
-      "name": "力成",
-      "reason": "量能2.1倍（>2.0倍）",
-      "total_score": 80.31
-    },
-    {
-      "code": "2338",
-      "name": "光罩",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 80.19
+      "code": "6691",
+      "name": "洋基工程",
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 83.39
     },
     {
       "code": "2404",
       "name": "漢唐",
+      "reason": "量能0.3倍（<0.7倍）",
+      "total_score": 82.99
+    },
+    {
+      "code": "3037",
+      "name": "欣興",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 82.75
+    },
+    {
+      "code": "8150",
+      "name": "南茂",
+      "reason": "近5日融資累計增加3957張（>3000張）；量能0.5倍（<0.7倍）",
+      "total_score": 80.79
+    },
+    {
+      "code": "3167",
+      "name": "大量",
+      "reason": "量能0.3倍（<0.7倍）",
+      "total_score": 80.78
+    },
+    {
+      "code": "6672",
+      "name": "騰輝電子-KY",
+      "reason": "量能0.3倍（<0.7倍）",
+      "total_score": 80.1
+    },
+    {
+      "code": "6257",
+      "name": "矽格",
+      "reason": "量能2.6倍（>2.0倍）",
+      "total_score": 80.07
+    },
+    {
+      "code": "3035",
+      "name": "智原",
       "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 77.0
+      "total_score": 80.04
     },
     {
-      "code": "6526",
-      "name": "達發",
-      "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 77.0
+      "code": "3661",
+      "name": "世芯-KY",
+      "reason": "量能2.1倍（>2.0倍）",
+      "total_score": 76.64
     },
     {
-      "code": "3016",
-      "name": "嘉晶",
-      "reason": "量能0.1倍（<0.7倍）",
-      "total_score": 76.72
+      "code": "2886",
+      "name": "兆豐金",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 73.73
+    },
+    {
+      "code": "3055",
+      "name": "蔚華科",
+      "reason": "量能0.2倍（<0.7倍）",
+      "total_score": 73.03
     },
     {
       "code": "2379",
       "name": "瑞昱",
       "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 75.27
-    },
-    {
-      "code": "3045",
-      "name": "台灣大",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 74.85
-    },
-    {
-      "code": "3167",
-      "name": "大量",
-      "reason": "量能0.2倍（<0.7倍）",
-      "total_score": 72.68
-    },
-    {
-      "code": "2451",
-      "name": "創見",
-      "reason": "量能2.3倍（>2.0倍）",
-      "total_score": 71.97
-    },
-    {
-      "code": "3090",
-      "name": "日電貿",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 68.68
-    },
-    {
-      "code": "6278",
-      "name": "台表科",
-      "reason": "量能2.6倍（>2.0倍）",
-      "total_score": 68.57
-    },
-    {
-      "code": "8021",
-      "name": "尖點",
-      "reason": "量能3.4倍（>2.0倍）",
-      "total_score": 68.0
-    },
-    {
-      "code": "3034",
-      "name": "聯詠",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 66.97
-    },
-    {
-      "code": "7788",
-      "name": "松川精密",
-      "reason": "量能2.7倍（>2.0倍）",
-      "total_score": 63.27
-    },
-    {
-      "code": "6861",
-      "name": "睿生光電",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 63.0
-    },
-    {
-      "code": "6209",
-      "name": "今國光",
-      "reason": "量能2.6倍（>2.0倍）",
-      "total_score": 62.7
-    },
-    {
-      "code": "2883",
-      "name": "凱基金",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 61.09
-    },
-    {
-      "code": "1301",
-      "name": "台塑",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 60.91
-    },
-    {
-      "code": "1605",
-      "name": "華新",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 60.4
+      "total_score": 72.86
     },
     {
       "code": "2313",
       "name": "華通",
-      "reason": "量能10.7倍（>2.0倍）",
-      "total_score": 59.8
+      "reason": "量能2.2倍（>2.0倍）",
+      "total_score": 72.49
+    },
+    {
+      "code": "6789",
+      "name": "采鈺",
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 72.03
+    },
+    {
+      "code": "2327",
+      "name": "國巨*",
+      "reason": "近5日融資累計增加4116張（>3000張）",
+      "total_score": 70.6
+    },
+    {
+      "code": "1301",
+      "name": "台塑",
+      "reason": "量能3.6倍（>2.0倍）",
+      "total_score": 70.22
+    },
+    {
+      "code": "6861",
+      "name": "睿生光電",
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 70.0
+    },
+    {
+      "code": "3016",
+      "name": "嘉晶",
+      "reason": "量能0.1倍（<0.7倍）",
+      "total_score": 69.59
+    },
+    {
+      "code": "1802",
+      "name": "台玻",
+      "reason": "量能6.5倍（>2.0倍）",
+      "total_score": 68.98
+    },
+    {
+      "code": "2883",
+      "name": "凱基金",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 68.72
+    },
+    {
+      "code": "2609",
+      "name": "陽明",
+      "reason": "量能0.6倍（<0.7倍）",
+      "total_score": 67.46
     },
     {
       "code": "6456",
       "name": "GIS-KY",
-      "reason": "近5日融資累計增加7481張（>3000張）；量能0.6倍（<0.7倍）",
-      "total_score": 59.69
-    },
-    {
-      "code": "6285",
-      "name": "啟碁",
-      "reason": "量能6.3倍（>2.0倍）",
-      "total_score": 58.91
-    },
-    {
-      "code": "6706",
-      "name": "惠特",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 58.55
-    },
-    {
-      "code": "6197",
-      "name": "佳必琪",
-      "reason": "量能4.9倍（>2.0倍）",
-      "total_score": 58.54
+      "reason": "近5日融資累計增加6334張（>3000張）；量能2.6倍（>2.0倍）",
+      "total_score": 67.27
     },
     {
       "code": "3533",
       "name": "嘉澤",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 56.64
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 62.99
     },
     {
-      "code": "2383",
-      "name": "台光電",
-      "reason": "量能2.6倍（>2.0倍）",
-      "total_score": 55.99
-    },
-    {
-      "code": "2363",
-      "name": "矽統",
+      "code": "3711",
+      "name": "日月光投控",
       "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 55.31
+      "total_score": 62.06
     },
     {
       "code": "2884",
       "name": "玉山金",
       "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 54.21
-    },
-    {
-      "code": "2892",
-      "name": "第一金",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 53.99
-    },
-    {
-      "code": "2880",
-      "name": "華南金",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 53.69
+      "total_score": 61.77
     },
     {
       "code": "2801",
       "name": "彰銀",
       "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 53.39
+      "total_score": 61.5
     },
     {
-      "code": "3055",
-      "name": "蔚華科",
-      "reason": "量能0.1倍（<0.7倍）",
-      "total_score": 53.0
-    },
-    {
-      "code": "3661",
-      "name": "世芯-KY",
-      "reason": "量能3.5倍（>2.0倍）",
-      "total_score": 52.83
-    },
-    {
-      "code": "3702",
-      "name": "大聯大",
-      "reason": "量能0.3倍（<0.7倍）",
-      "total_score": 52.14
-    },
-    {
-      "code": "8039",
-      "name": "台虹",
-      "reason": "近5日融資累計增加5992張（>3000張）",
-      "total_score": 51.58
-    },
-    {
-      "code": "4956",
-      "name": "光鋐",
+      "code": "3042",
+      "name": "晶技",
       "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 50.31
-    },
-    {
-      "code": "3094",
-      "name": "聯傑",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 50.16
-    },
-    {
-      "code": "3706",
-      "name": "神達",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 48.0
-    },
-    {
-      "code": "2303",
-      "name": "聯電",
-      "reason": "近5日融資累計增加16897張（>3000張）；量能2.7倍（>2.0倍）",
-      "total_score": 47.01
-    },
-    {
-      "code": "6168",
-      "name": "宏齊",
-      "reason": "量能2.9倍（>2.0倍）",
-      "total_score": 47.0
-    },
-    {
-      "code": "2484",
-      "name": "希華",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 43.29
-    },
-    {
-      "code": "3443",
-      "name": "創意",
-      "reason": "量能2.2倍（>2.0倍）",
-      "total_score": 43.0
+      "total_score": 60.87
     },
     {
       "code": "6834",
       "name": "天二科技",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 42.54
+      "reason": "量能3.0倍（>2.0倍）",
+      "total_score": 57.44
     },
     {
-      "code": "6116",
-      "name": "彩晶",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 42.44
+      "code": "6526",
+      "name": "達發",
+      "reason": "量能2.6倍（>2.0倍）",
+      "total_score": 56.8
     },
     {
-      "code": "6770",
-      "name": "力積電",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 41.85
+      "code": "2890",
+      "name": "永豐金",
+      "reason": "近5日融資累計增加4481張（>3000張）",
+      "total_score": 56.26
     },
     {
-      "code": "3714",
-      "name": "富采",
+      "code": "4919",
+      "name": "新唐",
+      "reason": "近5日融資累計增加6342張（>3000張）",
+      "total_score": 56.0
+    },
+    {
+      "code": "3706",
+      "name": "神達",
       "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 41.61
+      "total_score": 55.17
+    },
+    {
+      "code": "4956",
+      "name": "光鋐",
+      "reason": "量能0.2倍（<0.7倍）",
+      "total_score": 55.01
     },
     {
       "code": "1101",
       "name": "台泥",
       "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 39.25
+      "total_score": 54.25
     },
     {
-      "code": "2337",
-      "name": "旺宏",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 39.06
+      "code": "3094",
+      "name": "聯傑",
+      "reason": "量能0.2倍（<0.7倍）",
+      "total_score": 54.08
     },
     {
-      "code": "4919",
-      "name": "新唐",
-      "reason": "近5日融資累計增加3999張（>3000張）；量能0.5倍（<0.7倍）",
-      "total_score": 39.0
+      "code": "3714",
+      "name": "富采",
+      "reason": "量能0.3倍（<0.7倍）",
+      "total_score": 53.21
+    },
+    {
+      "code": "2618",
+      "name": "長榮航",
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 52.39
+    },
+    {
+      "code": "6213",
+      "name": "聯茂",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 49.0
     },
     {
       "code": "8996",
       "name": "高力",
-      "reason": "量能0.1倍（<0.7倍）",
-      "total_score": 39.0
+      "reason": "量能0.2倍（<0.7倍）",
+      "total_score": 45.83
     },
     {
-      "code": "4576",
-      "name": "大銀微系統",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 38.42
-    },
-    {
-      "code": "2002",
-      "name": "中鋼",
+      "code": "2338",
+      "name": "光罩",
       "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 38.16
-    },
-    {
-      "code": "3653",
-      "name": "健策",
-      "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 38.04
+      "total_score": 44.19
     },
     {
       "code": "6715",
       "name": "嘉基",
-      "reason": "量能2.8倍（>2.0倍）",
-      "total_score": 37.0
+      "reason": "量能2.6倍（>2.0倍）",
+      "total_score": 44.0
     },
     {
-      "code": "3532",
-      "name": "台勝科",
+      "code": "8039",
+      "name": "台虹",
+      "reason": "近5日融資累計增加5332張（>3000張）",
+      "total_score": 43.76
+    },
+    {
+      "code": "5269",
+      "name": "祥碩",
       "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 36.72
+      "total_score": 43.53
     },
     {
-      "code": "6533",
-      "name": "晶心科",
-      "reason": "量能0.2倍（<0.7倍）",
-      "total_score": 35.79
+      "code": "6442",
+      "name": "光聖",
+      "reason": "量能2.4倍（>2.0倍）",
+      "total_score": 40.74
     },
     {
-      "code": "8028",
-      "name": "昇陽半導體",
+      "code": "6116",
+      "name": "彩晶",
       "reason": "量能0.3倍（<0.7倍）",
-      "total_score": 35.16
+      "total_score": 40.65
     },
     {
-      "code": "2027",
-      "name": "大成鋼",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 33.39
-    },
-    {
-      "code": "2472",
-      "name": "立隆電",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 32.06
-    },
-    {
-      "code": "2542",
-      "name": "興富發",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 31.0
-    },
-    {
-      "code": "2049",
-      "name": "上銀",
-      "reason": "量能2.2倍（>2.0倍）",
-      "total_score": 29.05
-    },
-    {
-      "code": "2327",
-      "name": "國巨*",
-      "reason": "近5日融資累計增加4949張（>3000張）；量能0.5倍（<0.7倍）",
-      "total_score": 28.64
-    },
-    {
-      "code": "2887",
-      "name": "台新新光金",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 28.26
-    },
-    {
-      "code": "4938",
-      "name": "和碩",
+      "code": "2892",
+      "name": "第一金",
       "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 28.09
-    },
-    {
-      "code": "6226",
-      "name": "光鼎",
-      "reason": "量能2.5倍（>2.0倍）",
-      "total_score": 25.84
-    },
-    {
-      "code": "7799",
-      "name": "禾榮科",
-      "reason": "量能0.3倍（<0.7倍）",
-      "total_score": 25.0
+      "total_score": 40.49
     },
     {
       "code": "3149",
       "name": "正達",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 24.53
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 39.0
     },
     {
-      "code": "1590",
-      "name": "亞德客-KY",
-      "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 24.0
+      "code": "7799",
+      "name": "禾榮科",
+      "reason": "量能0.6倍（<0.7倍）",
+      "total_score": 39.0
     },
     {
-      "code": "3026",
-      "name": "禾伸堂",
+      "code": "2002",
+      "name": "中鋼",
       "reason": "量能0.5倍（<0.7倍）",
-      "total_score": 23.54
+      "total_score": 38.3
+    },
+    {
+      "code": "6533",
+      "name": "晶心科",
+      "reason": "量能0.1倍（<0.7倍）",
+      "total_score": 37.64
     },
     {
       "code": "6933",
       "name": "AMAX-KY",
-      "reason": "量能0.3倍（<0.7倍）",
-      "total_score": 23.26
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 36.98
     },
     {
-      "code": "2305",
-      "name": "全友",
+      "code": "2887",
+      "name": "台新新光金",
+      "reason": "量能0.6倍（<0.7倍）",
+      "total_score": 36.47
+    },
+    {
+      "code": "3673",
+      "name": "TPK-KY",
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 35.06
+    },
+    {
+      "code": "6805",
+      "name": "富世達",
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 33.22
+    },
+    {
+      "code": "2834",
+      "name": "臺企銀",
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 30.09
+    },
+    {
+      "code": "2472",
+      "name": "立隆電",
+      "reason": "量能3.4倍（>2.0倍）",
+      "total_score": 29.96
+    },
+    {
+      "code": "2455",
+      "name": "全新",
       "reason": "量能3.1倍（>2.0倍）",
-      "total_score": 23.0
+      "total_score": 29.08
+    },
+    {
+      "code": "3605",
+      "name": "宏致",
+      "reason": "量能2.1倍（>2.0倍）",
+      "total_score": 29.0
+    },
+    {
+      "code": "2426",
+      "name": "鼎元",
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 28.7
+    },
+    {
+      "code": "3715",
+      "name": "定穎投控",
+      "reason": "量能3.4倍（>2.0倍）",
+      "total_score": 27.55
+    },
+    {
+      "code": "5871",
+      "name": "中租-KY",
+      "reason": "量能0.6倍（<0.7倍）",
+      "total_score": 27.03
+    },
+    {
+      "code": "3090",
+      "name": "日電貿",
+      "reason": "量能3.1倍（>2.0倍）",
+      "total_score": 26.24
+    },
+    {
+      "code": "3481",
+      "name": "群創",
+      "reason": "近5日融資累計增加15347張（>3000張）；量能0.4倍（<0.7倍）",
+      "total_score": 25.97
+    },
+    {
+      "code": "2409",
+      "name": "友達",
+      "reason": "近5日融資累計增加24696張（>3000張）；量能0.6倍（<0.7倍）",
+      "total_score": 25.0
+    },
+    {
+      "code": "1590",
+      "name": "亞德客-KY",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 24.44
+    },
+    {
+      "code": "2303",
+      "name": "聯電",
+      "reason": "近5日融資累計增加9197張（>3000張）",
+      "total_score": 24.21
+    },
+    {
+      "code": "2376",
+      "name": "技嘉",
+      "reason": "量能2.1倍（>2.0倍）",
+      "total_score": 23.68
+    },
+    {
+      "code": "7788",
+      "name": "松川精密",
+      "reason": "量能2.2倍（>2.0倍）",
+      "total_score": 20.93
     },
     {
       "code": "1727",
       "name": "中華化",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 21.32
+      "reason": "量能0.3倍（<0.7倍）",
+      "total_score": 19.35
     },
     {
-      "code": "3583",
-      "name": "辛耘",
-      "reason": "量能2.2倍（>2.0倍）",
-      "total_score": 21.06
-    },
-    {
-      "code": "3036",
-      "name": "文曄",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 19.08
+      "code": "4977",
+      "name": "眾達-KY",
+      "reason": "量能2.6倍（>2.0倍）",
+      "total_score": 18.85
     },
     {
       "code": "3563",
       "name": "牧德",
       "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 18.75
-    },
-    {
-      "code": "8261",
-      "name": "富鼎",
-      "reason": "量能5.2倍（>2.0倍）",
-      "total_score": 18.0
-    },
-    {
-      "code": "3715",
-      "name": "定穎投控",
-      "reason": "量能2.9倍（>2.0倍）",
-      "total_score": 17.02
-    },
-    {
-      "code": "2455",
-      "name": "全新",
-      "reason": "量能7.8倍（>2.0倍）",
-      "total_score": 15.26
-    },
-    {
-      "code": "3481",
-      "name": "群創",
-      "reason": "近5日融資累計增加10846張（>3000張）；量能0.5倍（<0.7倍）",
-      "total_score": 14.86
-    },
-    {
-      "code": "2834",
-      "name": "臺企銀",
-      "reason": "量能0.7倍（<0.7倍）",
-      "total_score": 14.81
+      "total_score": 17.42
     },
     {
       "code": "2317",
       "name": "鴻海",
-      "reason": "近5日融資累計增加4650張（>3000張）；量能3.1倍（>2.0倍）",
-      "total_score": 13.55
+      "reason": "近5日融資累計增加3725張（>3000張）",
+      "total_score": 17.35
     },
     {
-      "code": "6669",
-      "name": "緯穎",
-      "reason": "量能2.5倍（>2.0倍）",
-      "total_score": 11.93
+      "code": "2395",
+      "name": "研華",
+      "reason": "量能0.7倍（<0.7倍）",
+      "total_score": 16.04
+    },
+    {
+      "code": "3006",
+      "name": "晶豪科",
+      "reason": "量能0.6倍（<0.7倍）",
+      "total_score": 13.8
+    },
+    {
+      "code": "2354",
+      "name": "鴻準",
+      "reason": "量能0.5倍（<0.7倍）",
+      "total_score": 12.88
+    },
+    {
+      "code": "4938",
+      "name": "和碩",
+      "reason": "量能0.4倍（<0.7倍）",
+      "total_score": 12.76
     },
     {
       "code": "2324",
       "name": "仁寶",
-      "reason": "量能0.6倍（<0.7倍）",
-      "total_score": 11.5
-    },
-    {
-      "code": "3376",
-      "name": "新日興",
       "reason": "量能0.7倍（<0.7倍）",
       "total_score": 10.0
     },
     {
-      "code": "6949",
-      "name": "沛爾生醫*-創",
-      "reason": "量能0.4倍（<0.7倍）",
-      "total_score": 10.0
+      "code": "6515",
+      "name": "穎崴",
+      "reason": "量能4.5倍（>2.0倍）",
+      "total_score": 8.0
     }
   ],
   "ranking": [
     {
-      "code": "6196",
-      "name": "帆宣",
+      "code": "2492",
+      "name": "華新科",
       "total_score": 100.0,
       "dimensions": {
         "institutional_streak": {
@@ -593,157 +533,7 @@
         "buy_without_retail_follow": {
           "weight": 0.3,
           "score": 100.0,
-          "fact": "法人買超2073張、融資減333張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.6倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 100.0,
-          "fact": "強於大盤24.0個百分點（個股32.6% vs 大盤8.6%）"
-        }
-      },
-      "close": 663.0,
-      "change_pct": 7.28,
-      "avg_value_20d": 1055860770.0
-    },
-    {
-      "code": "6213",
-      "name": "聯茂",
-      "total_score": 100.0,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 100,
-          "fact": "投信連8日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 100.0,
-          "fact": "法人買超4531張、融資減582張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.5倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 100.0,
-          "fact": "強於大盤45.1個百分點（個股53.7% vs 大盤8.6%）"
-        }
-      },
-      "close": 787.0,
-      "change_pct": 15.23,
-      "avg_value_20d": 10785278507.0
-    },
-    {
-      "code": "4958",
-      "name": "臻鼎-KY",
-      "total_score": 98.08,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 100,
-          "fact": "外資連5日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 99.77,
-          "fact": "法人買超32611張、融資增76張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.0倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 87.65,
-          "fact": "強於大盤15.1個百分點（個股23.7% vs 大盤8.6%）"
-        }
-      },
-      "close": 574.0,
-      "change_pct": 2.32,
-      "avg_value_20d": 15640374219.0
-    },
-    {
-      "code": "3019",
-      "name": "亞光",
-      "total_score": 88.73,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 100,
-          "fact": "外資連5日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 100.0,
-          "fact": "法人買超2075張、融資減374張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.0倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 24.89,
-          "fact": "弱於大盤10.0個百分點（個股-1.4% vs 大盤8.6%）"
-        }
-      },
-      "close": 141.0,
-      "change_pct": 1.44,
-      "avg_value_20d": 657099104.0
-    },
-    {
-      "code": "2492",
-      "name": "華新科",
-      "total_score": 88.63,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 80,
-          "fact": "外資連3日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 85.43,
-          "fact": "法人買超19129張、融資增2787張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.6倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 100.0,
-          "fact": "強於大盤34.8個百分點（個股43.5% vs 大盤8.6%）"
-        }
-      },
-      "close": 389.5,
-      "change_pct": 7.75,
-      "avg_value_20d": 9567581415.0
-    },
-    {
-      "code": "7795",
-      "name": "長廣",
-      "total_score": 87.32,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 80,
-          "fact": "外資連3日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 100.0,
-          "fact": "法人買超962張、融資減55張"
+          "fact": "法人買超39509張、融資減2213張"
         },
         "mild_volume_uptrend": {
           "weight": 0.2,
@@ -752,88 +542,28 @@
         },
         "relative_strength": {
           "weight": 0.15,
-          "score": 62.13,
-          "fact": "強於大盤4.9個百分點（個股13.5% vs 大盤8.6%）"
+          "score": 100.0,
+          "fact": "強於大盤36.4個百分點（個股43.4% vs 大盤7.0%）"
         }
       },
-      "close": 555.0,
-      "change_pct": 1.28,
-      "avg_value_20d": 664856625.0
+      "close": 428.0,
+      "change_pct": 9.88,
+      "avg_value_20d": 10381030732.0
     },
     {
-      "code": "1303",
-      "name": "南亞",
-      "total_score": 86.0,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 60,
-          "fact": "外資連2日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 100.0,
-          "fact": "法人買超50917張、融資減5848張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 100,
-          "fact": "量能1.6倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 100.0,
-          "fact": "強於大盤23.9個百分點（個股32.6% vs 大盤8.6%）"
-        }
-      },
-      "close": 293.0,
-      "change_pct": 12.69,
-      "avg_value_20d": 17009146821.0
-    },
-    {
-      "code": "3037",
-      "name": "欣興",
-      "total_score": 85.86,
+      "code": "6505",
+      "name": "台塑化",
+      "total_score": 97.33,
       "dimensions": {
         "institutional_streak": {
           "weight": 0.35,
           "score": 100,
-          "fact": "外資連4日買超"
+          "fact": "投信連10日買超"
         },
         "buy_without_retail_follow": {
           "weight": 0.3,
-          "score": 91.25,
-          "fact": "法人買超8633張、融資增755張"
-        },
-        "mild_volume_uptrend": {
-          "weight": 0.2,
-          "score": 42.43,
-          "fact": "量能0.9倍、近5日收盤走高"
-        },
-        "relative_strength": {
-          "weight": 0.15,
-          "score": 100.0,
-          "fact": "強於大盤33.3個百分點（個股41.9% vs 大盤8.6%）"
-        }
-      },
-      "close": 1310.0,
-      "change_pct": 0.38,
-      "avg_value_20d": 18029605704.0
-    },
-    {
-      "code": "2890",
-      "name": "永豐金",
-      "total_score": 85.66,
-      "dimensions": {
-        "institutional_streak": {
-          "weight": 0.35,
-          "score": 100,
-          "fact": "投信連4日買超"
-        },
-        "buy_without_retail_follow": {
-          "weight": 0.3,
-          "score": 79.81,
-          "fact": "法人買超2352張、融資增475張"
+          "score": 91.1,
+          "fact": "法人買超18235張、融資增1623張"
         },
         "mild_volume_uptrend": {
           "weight": 0.2,
@@ -842,18 +572,48 @@
         },
         "relative_strength": {
           "weight": 0.15,
-          "score": 44.82,
-          "fact": "弱於大盤2.1個百分點（個股6.6% vs 大盤8.6%）"
+          "score": 100.0,
+          "fact": "強於大盤30.0個百分點（個股37.0% vs 大盤7.0%）"
         }
       },
-      "close": 45.4,
-      "change_pct": 3.06,
-      "avg_value_20d": 1142470515.0
+      "close": 107.0,
+      "change_pct": 5.42,
+      "avg_value_20d": 2475953049.0
     },
     {
-      "code": "2881",
-      "name": "富邦金",
-      "total_score": 84.17,
+      "code": "1303",
+      "name": "南亞",
+      "total_score": 93.0,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 80,
+          "fact": "外資連3日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超30193張、融資減1378張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.4倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 100.0,
+          "fact": "強於大盤32.3個百分點（個股39.2% vs 大盤7.0%）"
+        }
+      },
+      "close": 314.0,
+      "change_pct": 7.17,
+      "avg_value_20d": 17700106648.0
+    },
+    {
+      "code": "8021",
+      "name": "尖點",
+      "total_score": 93.0,
       "dimensions": {
         "institutional_streak": {
           "weight": 0.35,
@@ -863,22 +623,202 @@
         "buy_without_retail_follow": {
           "weight": 0.3,
           "score": 100.0,
-          "fact": "法人買超2491張、融資減777張"
+          "fact": "法人買超3183張、融資減319張"
         },
         "mild_volume_uptrend": {
           "weight": 0.2,
           "score": 100,
-          "fact": "量能1.3倍、近5日收盤走高"
+          "fact": "量能1.8倍、近5日收盤走高"
         },
         "relative_strength": {
           "weight": 0.15,
-          "score": 41.14,
-          "fact": "弱於大盤3.5個百分點（個股5.1% vs 大盤8.6%）"
+          "score": 100.0,
+          "fact": "強於大盤25.4個百分點（個股32.4% vs 大盤7.0%）"
         }
       },
-      "close": 154.5,
-      "change_pct": 2.66,
-      "avg_value_20d": 2385334637.0
+      "close": 556.0,
+      "change_pct": -0.89,
+      "avg_value_20d": 2560688963.0
+    },
+    {
+      "code": "2360",
+      "name": "致茂",
+      "total_score": 92.66,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連5日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超44張、融資減139張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 79.76,
+          "fact": "量能2.0倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 78.08,
+          "fact": "強於大盤11.2個百分點（個股18.2% vs 大盤7.0%）"
+        }
+      },
+      "close": 2400.0,
+      "change_pct": 2.13,
+      "avg_value_20d": 6059825076.0
+    },
+    {
+      "code": "6209",
+      "name": "今國光",
+      "total_score": 91.01,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連4日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 89.36,
+          "fact": "法人買超5791張、融資增616張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.6倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 61.35,
+          "fact": "強於大盤4.5個百分點（個股11.5% vs 大盤7.0%）"
+        }
+      },
+      "close": 90.9,
+      "change_pct": 4.12,
+      "avg_value_20d": 782376044.0
+    },
+    {
+      "code": "2451",
+      "name": "創見",
+      "total_score": 90.21,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連6日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超549張、融資減100張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.2倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 34.71,
+          "fact": "弱於大盤6.1個百分點（個股0.9% vs 大盤7.0%）"
+        }
+      },
+      "close": 287.0,
+      "change_pct": 2.87,
+      "avg_value_20d": 602843246.0
+    },
+    {
+      "code": "3044",
+      "name": "健鼎",
+      "total_score": 90.06,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 80,
+          "fact": "投信連3日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超1695張、融資減347張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.1倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 80.37,
+          "fact": "強於大盤12.1個百分點（個股19.1% vs 大盤7.0%）"
+        }
+      },
+      "close": 582.0,
+      "change_pct": 0.52,
+      "avg_value_20d": 1486261546.0
+    },
+    {
+      "code": "2882",
+      "name": "國泰金",
+      "total_score": 89.23,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "投信連4日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超12012張、融資減534張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.2倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 28.17,
+          "fact": "弱於大盤8.7個百分點（個股-1.7% vs 大盤7.0%）"
+        }
+      },
+      "close": 113.0,
+      "change_pct": 0.89,
+      "avg_value_20d": 2187779281.0
+    },
+    {
+      "code": "2377",
+      "name": "微星",
+      "total_score": 88.6,
+      "dimensions": {
+        "institutional_streak": {
+          "weight": 0.35,
+          "score": 100,
+          "fact": "外資連4日買超"
+        },
+        "buy_without_retail_follow": {
+          "weight": 0.3,
+          "score": 100.0,
+          "fact": "法人買超2821張、融資減272張"
+        },
+        "mild_volume_uptrend": {
+          "weight": 0.2,
+          "score": 100,
+          "fact": "量能1.1倍、近5日收盤走高"
+        },
+        "relative_strength": {
+          "weight": 0.15,
+          "score": 24.0,
+          "fact": "弱於大盤10.4個百分點（個股-3.4% vs 大盤7.0%）"
+        }
+      },
+      "close": 156.0,
+      "change_pct": 0.65,
+      "avg_value_20d": 1062537133.0
     }
   ]
 }
