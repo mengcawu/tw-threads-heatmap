@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# refresh_threads_token.py 跟 daily_run.py 交接剛刷新出來的 token 用的暫存
+# 檔，正常情況下用完就刪，這裡只是多一層保險，避免哪天不小心留在硬碟上時
+# 被某個 `git add -A`/`git add .` 誤加進 commit。
+.threads_token_refreshed

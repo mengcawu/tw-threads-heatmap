@@ -6,6 +6,18 @@
 依序執行既有、已個別驗證過的腳本（不重寫抓取/評分/繪圖/發布邏輯，只負責串起來
 ＋失敗就停＋落地 commit）：
 
+    0. python3 refresh_threads_token.py      刷新 Threads 長效 token、自動寫回
+                                              GitHub secret THREADS_ACCESS_TOKEN，
+                                              避免每約60天要手動重新走一次換票
+                                              流程（2026-10-08 那組 token 過期、
+                                              連續好幾天發布失敗才補上這一步）。
+                                              放在最前面：連「非交易日」「今天
+                                              已發布過」都照跑，盡量不錯過刷新
+                                              機會。失敗（含 GH_PAT 未設定、距離
+                                              上次刷新不滿24小時）只印警告、不
+                                              中止流程——今天發布用的是目前這組
+                                              還沒過期的 token，不受影響。
+
     1+2+3. python3 ingest_stock_day.py       抓當日全市場量價，清洗只留普通股，
                                               併入 data/stock_day_common.csv，
                                               裁剪維持滾動30個交易日。
@@ -91,6 +103,7 @@
 """
 
 import csv
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -100,8 +113,16 @@ from zoneinfo import ZoneInfo
 REPO_ROOT = Path(__file__).resolve().parent
 TAIPEI_TZ = ZoneInfo("Asia/Taipei")
 
+# 必須跟 refresh_threads_token.py 裡同名常數的值保持一致——這裡不直接
+# `import refresh_threads_token` 來重用那個常數，是故意的：那支腳本依賴
+# requests、pynacl 這些第三方套件，如果拿來 import，會讓 daily_run.py
+# 整支腳本在載入階段就要求裝好那些套件，即使今天根本沒要跑到刷新 token
+# 這步（例如本機測試只想跑評分/繪圖）也會因為 import 失敗而整個起不來。
+TOKEN_HANDOFF_PATH = REPO_ROOT / ".threads_token_refreshed"
+
 NON_TRADING_DAY_EXIT_CODE = 2  # 跟 ingest_stock_day.py 的 exit code 約定一致
 IG_NOT_CONFIGURED_EXIT_CODE = 3  # 跟 publish_instagram.py 的 exit code 約定一致
+TOKEN_REFRESH_NOT_CONFIGURED_EXIT_CODE = 3  # 跟 refresh_threads_token.py 的 exit code 約定一致
 
 DATA_PATHS = [
     "data/stock_day_common.csv",
@@ -200,6 +221,28 @@ def margin_has_date(date_str: str) -> bool:
 
 
 def main():
+    # ---- 步驟 0：刷新 Threads token（放在最前面，連非交易日/已發布過也會跑，
+    # 確保每次觸發都盡量延長 token 效期，不會因為假日連續多天沒跑而錯過刷新
+    # 機會）。失敗（含「GH_PAT 尚未設定」「距離上次刷新不滿24小時」）都只印
+    # 警告，不中止流程——今天的發布用的是目前這組還沒過期的 token，不受影響。
+    rc = run_step("刷新 Threads token", "refresh_threads_token.py")
+    if rc == TOKEN_REFRESH_NOT_CONFIGURED_EXIT_CODE:
+        print("\n[提示] Token 自動刷新尚未設定（缺 GH_PAT），跳過。", flush=True)
+    elif rc != 0:
+        print(
+            "\n[警告] Token 自動刷新失敗，不影響今天其餘流程"
+            "（見上方 refresh_threads_token.py 的輸出）。",
+            file=sys.stderr,
+            flush=True,
+        )
+    elif TOKEN_HANDOFF_PATH.exists():
+        # 刷新成功：不確定 Meta 是否讓舊 token 在原訂效期內繼續有效，保守
+        # 起見，這次行程裡如果稍後還要呼叫 publish_threads.py，一律改用剛
+        # 刷新出來的新 token。讀完立刻刪除，不讓它留在硬碟上。
+        os.environ["THREADS_ACCESS_TOKEN"] = TOKEN_HANDOFF_PATH.read_text(encoding="utf-8").strip()
+        TOKEN_HANDOFF_PATH.unlink()
+        print("\n[刷新] 本次行程已改用剛刷新出來的新 token。", flush=True)
+
     if already_published_today():
         print("\n今天已經發布過（output/published_date.txt 日期就是今天），跳過。", flush=True)
         sys.exit(0)

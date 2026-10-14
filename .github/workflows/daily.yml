@@ -41,7 +41,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install Python dependencies
-        run: pip install requests pillow playwright
+        # pynacl：refresh_threads_token.py 用來依 GitHub API 規定的方式加密
+        # 新 token，寫回 Actions secret 前一定要先加密，公鑰不能明文送出去。
+        run: pip install requests pillow playwright pynacl
 
       - name: Install Playwright Chromium
         # render_card.py 用 Playwright 開無頭 Chromium 把圖卡截成 PNG，
@@ -67,4 +69,11 @@ jobs:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          # GH_PAT：refresh_threads_token.py 刷新 Threads token 後，要呼叫
+          # GitHub API 寫回 THREADS_ACCESS_TOKEN 這個 secret——預設的
+          # GITHUB_TOKEN 沒有改 Actions secrets 的權限，一定要另外這組有
+          # 「Secrets: Read and write」權限的 personal access token 才行。
+          # 還沒設定這個 secret 的話，token 自動刷新功能會跳過（不影響其餘
+          # 流程），見 refresh_threads_token.py 開頭說明。
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: python3 daily_run.py
