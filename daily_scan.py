@@ -10,10 +10,38 @@ import sqlite3
 import smtplib
 import argparse
 import datetime as dt
+import time
 from email.mime.text import MIMEText
 
 import requests
 import pandas as pd
+
+# 2026-10-15 實際發生過一次：抓 TPEx 資料抓到一半連線被切斷
+# （urllib3.exceptions.IncompleteRead → requests.exceptions.ChunkedEncodingError），
+# 不是資料本身有問題，單純伺服器端/網路暫時性問題，重試就過了。兩個
+# fetch_*_today() 都在跑排程，沒人在旁邊手動重試，所以直接包一層自動重試。
+FETCH_RETRIES = 3
+FETCH_RETRY_DELAY_SECONDS = 5
+
+
+def _get_with_retry(url, **kwargs):
+    """requests.get 包一層重試，只重試連線層級的暫時性錯誤（逾時、連線中斷、
+    資料讀到一半被切斷等），不重試 HTTP 4xx/5xx 這種狀態碼錯誤（那些重試也
+    不會變好，直接讓 r.raise_for_status() 照常往外丟）。"""
+    last_err = None
+    for attempt in range(1, FETCH_RETRIES + 1):
+        try:
+            return requests.get(url, timeout=30, **kwargs)
+        except requests.exceptions.RequestException as e:
+            last_err = e
+            print(
+                f"[重試] 抓取失敗（第{attempt}次）：{e}"
+                f"{'，' + str(FETCH_RETRY_DELAY_SECONDS) + '秒後重試' if attempt < FETCH_RETRIES else '，不再重試'}",
+                flush=True,
+            )
+            if attempt < FETCH_RETRIES:
+                time.sleep(FETCH_RETRY_DELAY_SECONDS)
+    raise last_err
 
 # ========== 假設值 / 可調參數（你的截圖沒給明確數字，需要你確認）==========
 CONSOLIDATION_LOOKBACK = 20      # 判斷「橫盤」的觀察天數（假設）
@@ -30,7 +58,7 @@ DB_PATH = os.environ.get("TW_SCAN_DB", "tw_daily.db")
 def fetch_twse_today() -> pd.DataFrame:
     """抓上市今日全市場收盤價"""
     url = "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
-    r = requests.get(url, timeout=30)
+    r = _get_with_retry(url)
     r.raise_for_status()
     data = r.json()
     df = pd.DataFrame(data)
@@ -49,7 +77,7 @@ def fetch_tpex_today(target_date: dt.date) -> pd.DataFrame:
     """抓上櫃今日全市場收盤價"""
     url = "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"
     params = {"l": "zh-tw", "d": _roc_date(target_date), "s": "0,asc,0"}
-    r = requests.get(url, params=params, timeout=30)
+    r = _get_with_retry(url, params=params)
     r.raise_for_status()
     data = r.json()
     if not data:
