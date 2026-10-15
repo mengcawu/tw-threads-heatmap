@@ -30,7 +30,7 @@ output/ 都不在 docs/ 裡，不會被 Pages 服務到。
     4. Pages 部署有延遲，push 完不會馬上生效：建立 container 前先輪詢這個
        URL，確認回應 200、content-type 是 image/*，而且**抓到的內容雜湊真的
        等於剛部署的這份**（不是只信任狀態碼，因為狀態碼可能是 CDN 快取住的
-       舊內容也回 200），最多等 120 秒；逾時就直接報錯中止，不會拿可能是舊
+       舊內容也回 200），最多等 240 秒；逾時就直接報錯中止，不會拿可能是舊
        內容的圖硬送給 Threads。
     5. 用 Threads Graph API 兩步驟發布：
          a. POST /{user-id}/threads          建立媒體 container（拿 creation_id）
@@ -114,10 +114,12 @@ PUBLISH_RETRY_BASE_DELAY_SECONDS = 5  # 重試間隔遞增：5, 10, 15, 20, 25 �
 # GitHub Pages 部署延遲：push 完不會馬上生效，建 container 前先輪詢確認圖片
 # 網址真的能公開抓到、內容雜湊也對得上。現在檔名本身帶內容雜湊、每次都是
 # 全新路徑，理論上不會有 CDN 快取舊內容的問題，但 Pages 本身「部署」（不是
-# CDN 快取）還是要等一下才會生效，所以保留輪詢機制，等長一點（120秒）比較
-# 保險。
+# CDN 快取）還是要等一下才會生效，所以保留輪詢機制。原本設 120 秒，
+# 2026-10-14 當天實測遇過一次 120 秒內都還沒部署完、連續24次全部404、
+# 整天發布因此失敗的狀況（重跑後正常，確認是部署比較慢，不是程式邏輯錯），
+# 拉長到 240 秒給更多容錯空間。
 PAGES_POLL_INTERVAL_SECONDS = 5
-PAGES_POLL_MAX_ATTEMPTS = 24  # 5秒 * 24 = 最多等 120 秒
+PAGES_POLL_MAX_ATTEMPTS = 48  # 5秒 * 48 = 最多等 240 秒
 
 
 class PublishError(Exception):
