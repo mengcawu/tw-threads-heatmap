@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-10-15",
+  "report_date": "2026-10-16",
   "sectors": [
     {
-      "sector": "金融保險",
-      "net_buy_value_twd": 10275585592.0,
+      "sector": "電子零組件",
+      "net_buy_value_twd": 10447424266.0,
       "stocks": [
         {
-          "code": "2886",
-          "name": "兆豐金",
-          "net_buy_value_twd": 1774220438.0
+          "code": "2313",
+          "name": "華通",
+          "net_buy_value_twd": 4181246024.0
         },
         {
-          "code": "2891",
-          "name": "中信金",
-          "net_buy_value_twd": 1253289656.0
+          "code": "4958",
+          "name": "臻鼎-KY",
+          "net_buy_value_twd": 3223692643.0
         },
         {
-          "code": "2890",
-          "name": "永豐金",
-          "net_buy_value_twd": 1147684740.0
+          "code": "2368",
+          "name": "金像電",
+          "net_buy_value_twd": 1767667185.0
         }
       ]
     },
     {
-      "sector": "光電",
-      "net_buy_value_twd": 5323264342.0,
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 9340009431.0,
       "stocks": [
         {
-          "code": "6278",
-          "name": "台表科",
-          "net_buy_value_twd": 3423007968.0
+          "code": "3231",
+          "name": "緯創",
+          "net_buy_value_twd": 1731845065.0
         },
         {
-          "code": "6209",
-          "name": "今國光",
-          "net_buy_value_twd": 1139321052.0
+          "code": "6669",
+          "name": "緯穎",
+          "net_buy_value_twd": 1563702075.0
         },
         {
-          "code": "6456",
-          "name": "GIS-KY",
-          "net_buy_value_twd": 322971956.0
+          "code": "2382",
+          "name": "廣達",
+          "net_buy_value_twd": 1243261320.0
         }
       ]
     },
     {
       "sector": "半導體",
-      "net_buy_value_twd": 4783556883.0,
+      "net_buy_value_twd": 8503644051.0,
       "stocks": [
         {
-          "code": "3443",
-          "name": "創意",
-          "net_buy_value_twd": 1512623710.0
-        },
-        {
-          "code": "3034",
-          "name": "聯詠",
-          "net_buy_value_twd": 1331691440.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 2186047688.0
         },
         {
           "code": "2379",
           "name": "瑞昱",
-          "net_buy_value_twd": 475090344.0
+          "net_buy_value_twd": 1061064408.0
+        },
+        {
+          "code": "3034",
+          "name": "聯詠",
+          "net_buy_value_twd": 629446415.0
         }
       ]
     }
