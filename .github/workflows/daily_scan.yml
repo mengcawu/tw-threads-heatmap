@@ -6,6 +6,12 @@ on:
     - cron: "40 5 * * 1-5"
   workflow_dispatch: {}
 
+# 「提交更新後的資料庫」那個步驟要 git push tw_daily.db 回 repo，預設的
+# GITHUB_TOKEN 是唯讀的（2026-10-16 實測：git push 被拒絕，403），
+# 一定要這裡明確開寫入權限才行。
+permissions:
+  contents: write
+
 jobs:
   scan:
     runs-on: ubuntu-latest
