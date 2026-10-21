@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-10-20",
+  "report_date": "2026-10-21",
   "sectors": [
     {
-      "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 15794600809.0,
+      "sector": "半導體",
+      "net_buy_value_twd": 12795022110.0,
       "stocks": [
         {
-          "code": "3231",
-          "name": "緯創",
-          "net_buy_value_twd": 8070829200.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 1846090164.0
         },
         {
-          "code": "2382",
-          "name": "廣達",
-          "net_buy_value_twd": 1400589166.0
+          "code": "2408",
+          "name": "南亞科",
+          "net_buy_value_twd": 1763720154.0
         },
         {
-          "code": "2377",
-          "name": "微星",
-          "net_buy_value_twd": 984575106.0
+          "code": "3034",
+          "name": "聯詠",
+          "net_buy_value_twd": 1301034960.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 4347654196.0,
+      "net_buy_value_twd": 9880546937.0,
       "stocks": [
         {
-          "code": "3026",
-          "name": "禾伸堂",
-          "net_buy_value_twd": 2465134976.0
+          "code": "2327",
+          "name": "國巨*",
+          "net_buy_value_twd": 2693960052.0
         },
         {
-          "code": "2313",
-          "name": "華通",
-          "net_buy_value_twd": 509628212.0
+          "code": "2492",
+          "name": "華新科",
+          "net_buy_value_twd": 1793874014.0
         },
         {
-          "code": "6805",
-          "name": "富世達",
-          "net_buy_value_twd": 388908410.0
+          "code": "4958",
+          "name": "臻鼎-KY",
+          "net_buy_value_twd": 1400502092.0
         }
       ]
     },
     {
-      "sector": "半導體",
-      "net_buy_value_twd": 2429479474.0,
+      "sector": "塑膠",
+      "net_buy_value_twd": 9444374170.0,
       "stocks": [
         {
-          "code": "3443",
-          "name": "創意",
-          "net_buy_value_twd": 1429703765.0
+          "code": "1303",
+          "name": "南亞",
+          "net_buy_value_twd": 8501173722.0
         },
         {
-          "code": "6526",
-          "name": "達發",
-          "net_buy_value_twd": 207256347.0
+          "code": "1301",
+          "name": "台塑",
+          "net_buy_value_twd": 409656786.0
         },
         {
-          "code": "2379",
-          "name": "瑞昱",
-          "net_buy_value_twd": 204712164.0
+          "code": "1326",
+          "name": "台化",
+          "net_buy_value_twd": 408990775.0
         }
       ]
     }
