@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-10-27",
+  "report_date": "2026-10-28",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 31038454954.0,
+      "net_buy_value_twd": 24710909882.0,
       "stocks": [
         {
-          "code": "2330",
-          "name": "台積電",
-          "net_buy_value_twd": 6501679200.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 4598568608.0
+        },
+        {
+          "code": "3711",
+          "name": "日月光投控",
+          "net_buy_value_twd": 3966260750.0
         },
         {
           "code": "2408",
           "name": "南亞科",
-          "net_buy_value_twd": 5699226897.0
-        },
-        {
-          "code": "6770",
-          "name": "力積電",
-          "net_buy_value_twd": 4346912097.0
+          "net_buy_value_twd": 3114159849.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 12286440318.0,
+      "net_buy_value_twd": 9507823772.0,
       "stocks": [
-        {
-          "code": "3653",
-          "name": "健策",
-          "net_buy_value_twd": 5025342620.0
-        },
         {
           "code": "2327",
           "name": "國巨*",
-          "net_buy_value_twd": 3281911855.0
+          "net_buy_value_twd": 4065245471.0
+        },
+        {
+          "code": "3026",
+          "name": "禾伸堂",
+          "net_buy_value_twd": 724156256.0
         },
         {
           "code": "2059",
           "name": "川湖",
-          "net_buy_value_twd": 1065150180.0
+          "net_buy_value_twd": 705059600.0
         }
       ]
     },
     {
-      "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 8439198004.0,
+      "sector": "光電",
+      "net_buy_value_twd": 7730638768.0,
       "stocks": [
         {
-          "code": "6669",
-          "name": "緯穎",
-          "net_buy_value_twd": 2268277050.0
+          "code": "2409",
+          "name": "友達",
+          "net_buy_value_twd": 2770398275.0
         },
         {
-          "code": "2382",
-          "name": "廣達",
-          "net_buy_value_twd": 1601716695.0
+          "code": "3008",
+          "name": "大立光",
+          "net_buy_value_twd": 2000219235.0
         },
         {
-          "code": "2356",
-          "name": "英業達",
-          "net_buy_value_twd": 1118976642.0
+          "code": "3481",
+          "name": "群創",
+          "net_buy_value_twd": 1259023250.0
         }
       ]
     }
