@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-10-29",
+  "report_date": "2026-10-30",
   "sectors": [
     {
-      "sector": "半導體",
-      "net_buy_value_twd": 11164363162.0,
+      "sector": "航運",
+      "net_buy_value_twd": 5095078305.0,
       "stocks": [
         {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 3047767650.0
+          "code": "2603",
+          "name": "長榮",
+          "net_buy_value_twd": 2870292298.0
         },
         {
-          "code": "2344",
-          "name": "華邦電",
-          "net_buy_value_twd": 2411660950.0
+          "code": "2609",
+          "name": "陽明",
+          "net_buy_value_twd": 1070119399.0
         },
         {
-          "code": "3035",
-          "name": "智原",
-          "net_buy_value_twd": 2108572839.0
-        }
-      ]
-    },
-    {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 7605810550.0,
-      "stocks": [
-        {
-          "code": "2383",
-          "name": "台光電",
-          "net_buy_value_twd": 2612043660.0
-        },
-        {
-          "code": "2492",
-          "name": "華新科",
-          "net_buy_value_twd": 2213719317.0
-        },
-        {
-          "code": "3533",
-          "name": "嘉澤",
-          "net_buy_value_twd": 714270800.0
+          "code": "2615",
+          "name": "萬海",
+          "net_buy_value_twd": 330767880.0
         }
       ]
     },
     {
       "sector": "金融保險",
-      "net_buy_value_twd": 5137371160.0,
+      "net_buy_value_twd": 3710528267.0,
       "stocks": [
         {
           "code": "2891",
           "name": "中信金",
-          "net_buy_value_twd": 1092132074.0
+          "net_buy_value_twd": 1237697420.0
         },
         {
-          "code": "2887",
-          "name": "台新新光金",
-          "net_buy_value_twd": 787093884.0
+          "code": "5880",
+          "name": "合庫金",
+          "net_buy_value_twd": 274681939.0
         },
         {
-          "code": "2881",
-          "name": "富邦金",
-          "net_buy_value_twd": 767197980.0
+          "code": "2882",
+          "name": "國泰金",
+          "net_buy_value_twd": 260948148.0
+        }
+      ]
+    },
+    {
+      "sector": "通信網路",
+      "net_buy_value_twd": 3198123900.0,
+      "stocks": [
+        {
+          "code": "2412",
+          "name": "中華電",
+          "net_buy_value_twd": 1272760800.0
+        },
+        {
+          "code": "2345",
+          "name": "智邦",
+          "net_buy_value_twd": 417826340.0
+        },
+        {
+          "code": "4904",
+          "name": "遠傳",
+          "net_buy_value_twd": 403106736.0
         }
       ]
     }
