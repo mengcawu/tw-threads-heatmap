@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-02",
+  "report_date": "2026-11-03",
   "sectors": [
     {
-      "sector": "半導體",
-      "net_buy_value_twd": 3464427567.0,
-      "stocks": [
-        {
-          "code": "2449",
-          "name": "京元電子",
-          "net_buy_value_twd": 553417224.0
-        },
-        {
-          "code": "6515",
-          "name": "穎崴",
-          "net_buy_value_twd": 492354330.0
-        },
-        {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 492004288.0
-        }
-      ]
-    },
-    {
       "sector": "電子零組件",
-      "net_buy_value_twd": 3018048717.0,
+      "net_buy_value_twd": 5328853400.0,
       "stocks": [
         {
-          "code": "3533",
-          "name": "嘉澤",
-          "net_buy_value_twd": 627929120.0
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 1241471920.0
         },
         {
           "code": "3026",
           "name": "禾伸堂",
-          "net_buy_value_twd": 464869860.0
+          "net_buy_value_twd": 986455162.0
         },
         {
-          "code": "6805",
-          "name": "富世達",
-          "net_buy_value_twd": 328743850.0
+          "code": "2059",
+          "name": "川湖",
+          "net_buy_value_twd": 503644680.0
         }
       ]
     },
     {
-      "sector": "光電",
-      "net_buy_value_twd": 2389765640.0,
+      "sector": "半導體",
+      "net_buy_value_twd": 4103266966.0,
       "stocks": [
         {
-          "code": "3481",
-          "name": "群創",
-          "net_buy_value_twd": 1362546469.0
+          "code": "3443",
+          "name": "創意",
+          "net_buy_value_twd": 1137156840.0
         },
         {
-          "code": "2409",
-          "name": "友達",
-          "net_buy_value_twd": 334132882.0
+          "code": "6515",
+          "name": "穎崴",
+          "net_buy_value_twd": 1131550075.0
         },
         {
-          "code": "3406",
-          "name": "玉晶光",
-          "net_buy_value_twd": 293842710.0
+          "code": "3532",
+          "name": "台勝科",
+          "net_buy_value_twd": 432089868.0
+        }
+      ]
+    },
+    {
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 2859628394.0,
+      "stocks": [
+        {
+          "code": "6669",
+          "name": "緯穎",
+          "net_buy_value_twd": 492860040.0
+        },
+        {
+          "code": "8210",
+          "name": "勤誠",
+          "net_buy_value_twd": 443190471.0
+        },
+        {
+          "code": "2395",
+          "name": "研華",
+          "net_buy_value_twd": 328037040.0
         }
       ]
     }
