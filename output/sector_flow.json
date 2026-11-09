@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-06",
+  "report_date": "2026-11-09",
   "sectors": [
     {
+      "sector": "金融保險",
+      "net_buy_value_twd": 3437396991.0,
+      "stocks": [
+        {
+          "code": "2891",
+          "name": "中信金",
+          "net_buy_value_twd": 1013665221.0
+        },
+        {
+          "code": "2885",
+          "name": "元大金",
+          "net_buy_value_twd": 567803803.0
+        },
+        {
+          "code": "2882",
+          "name": "國泰金",
+          "net_buy_value_twd": 526529055.0
+        }
+      ]
+    },
+    {
+      "sector": "其他電子",
+      "net_buy_value_twd": 3009212573.0,
+      "stocks": [
+        {
+          "code": "2317",
+          "name": "鴻海",
+          "net_buy_value_twd": 2181669197.0
+        },
+        {
+          "code": "6139",
+          "name": "亞翔",
+          "net_buy_value_twd": 280547736.0
+        },
+        {
+          "code": "3030",
+          "name": "德律",
+          "net_buy_value_twd": 193640863.0
+        }
+      ]
+    },
+    {
       "sector": "半導體",
-      "net_buy_value_twd": 7755851014.0,
+      "net_buy_value_twd": 2359508142.0,
       "stocks": [
         {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 1905552510.0
+          "code": "2344",
+          "name": "華邦電",
+          "net_buy_value_twd": 361161345.0
         },
         {
-          "code": "6239",
-          "name": "力成",
-          "net_buy_value_twd": 1093930734.0
+          "code": "3450",
+          "name": "聯鈞",
+          "net_buy_value_twd": 301952658.0
         },
         {
-          "code": "6770",
-          "name": "力積電",
-          "net_buy_value_twd": 555750366.0
-        }
-      ]
-    },
-    {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 6309413119.0,
-      "stocks": [
-        {
-          "code": "3653",
-          "name": "健策",
-          "net_buy_value_twd": 931465975.0
-        },
-        {
-          "code": "6213",
-          "name": "聯茂",
-          "net_buy_value_twd": 828831376.0
-        },
-        {
-          "code": "2059",
-          "name": "川湖",
-          "net_buy_value_twd": 550573135.0
-        }
-      ]
-    },
-    {
-      "sector": "光電",
-      "net_buy_value_twd": 3445971256.0,
-      "stocks": [
-        {
-          "code": "3008",
-          "name": "大立光",
-          "net_buy_value_twd": 963988480.0
-        },
-        {
-          "code": "3481",
-          "name": "群創",
-          "net_buy_value_twd": 878067579.0
-        },
-        {
-          "code": "2409",
-          "name": "友達",
-          "net_buy_value_twd": 497172512.0
+          "code": "2379",
+          "name": "瑞昱",
+          "net_buy_value_twd": 254687026.0
         }
       ]
     }
