@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-12",
+  "report_date": "2026-11-13",
   "sectors": [
     {
       "sector": "半導體",
-      "net_buy_value_twd": 16124767731.0,
+      "net_buy_value_twd": 25582038774.0,
       "stocks": [
         {
           "code": "2454",
           "name": "聯發科",
-          "net_buy_value_twd": 7207896850.0
-        },
-        {
-          "code": "3443",
-          "name": "創意",
-          "net_buy_value_twd": 3453896220.0
+          "net_buy_value_twd": 10752849800.0
         },
         {
           "code": "3661",
           "name": "世芯-KY",
-          "net_buy_value_twd": 2187514350.0
-        }
-      ]
-    },
-    {
-      "sector": "玻璃陶瓷",
-      "net_buy_value_twd": 11883334392.0,
-      "stocks": [
-        {
-          "code": "1802",
-          "name": "台玻",
-          "net_buy_value_twd": 11821646778.0
+          "net_buy_value_twd": 4635441900.0
         },
         {
-          "code": "1809",
-          "name": "中釉",
-          "net_buy_value_twd": 58744053.0
-        },
-        {
-          "code": "1810",
-          "name": "和成",
-          "net_buy_value_twd": 2943561.0
+          "code": "2303",
+          "name": "聯電",
+          "net_buy_value_twd": 2090038976.0
         }
       ]
     },
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 5425983382.0,
+      "net_buy_value_twd": 10753488966.0,
       "stocks": [
         {
-          "code": "4927",
-          "name": "泰鼎-KY",
-          "net_buy_value_twd": 956863850.0
+          "code": "2355",
+          "name": "敬鵬",
+          "net_buy_value_twd": 2292896065.0
         },
         {
-          "code": "2383",
-          "name": "台光電",
-          "net_buy_value_twd": 768755665.0
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 1808726620.0
         },
         {
-          "code": "2313",
-          "name": "華通",
-          "net_buy_value_twd": 546503272.0
+          "code": "2368",
+          "name": "金像電",
+          "net_buy_value_twd": 1445831600.0
+        }
+      ]
+    },
+    {
+      "sector": "金融保險",
+      "net_buy_value_twd": 7116338327.0,
+      "stocks": [
+        {
+          "code": "2891",
+          "name": "中信金",
+          "net_buy_value_twd": 1804216703.0
+        },
+        {
+          "code": "2881",
+          "name": "富邦金",
+          "net_buy_value_twd": 1342612485.0
+        },
+        {
+          "code": "2882",
+          "name": "國泰金",
+          "net_buy_value_twd": 732600541.0
         }
       ]
     }
