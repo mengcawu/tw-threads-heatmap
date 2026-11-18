@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-17",
+  "report_date": "2026-11-18",
   "sectors": [
     {
       "sector": "電子零組件",
-      "net_buy_value_twd": 11459258310.0,
+      "net_buy_value_twd": 3277110228.0,
       "stocks": [
         {
-          "code": "2383",
-          "name": "台光電",
-          "net_buy_value_twd": 3362302620.0
+          "code": "8046",
+          "name": "南電",
+          "net_buy_value_twd": 882272400.0
         },
         {
-          "code": "3653",
-          "name": "健策",
-          "net_buy_value_twd": 3050847285.0
+          "code": "3026",
+          "name": "禾伸堂",
+          "net_buy_value_twd": 753842917.0
         },
         {
-          "code": "2059",
-          "name": "川湖",
-          "net_buy_value_twd": 757102060.0
+          "code": "6213",
+          "name": "聯茂",
+          "net_buy_value_twd": 340792553.0
         }
       ]
     },
     {
       "sector": "半導體",
-      "net_buy_value_twd": 4353464078.0,
+      "net_buy_value_twd": 3023924362.0,
       "stocks": [
         {
-          "code": "2449",
-          "name": "京元電子",
-          "net_buy_value_twd": 1290942004.0
+          "code": "3661",
+          "name": "世芯-KY",
+          "net_buy_value_twd": 1171988700.0
         },
         {
-          "code": "2408",
-          "name": "南亞科",
-          "net_buy_value_twd": 408947658.0
+          "code": "8028",
+          "name": "昇陽半導體",
+          "net_buy_value_twd": 466526866.0
         },
         {
-          "code": "6515",
-          "name": "穎崴",
-          "net_buy_value_twd": 396457490.0
+          "code": "2379",
+          "name": "瑞昱",
+          "net_buy_value_twd": 163063972.0
         }
       ]
     },
     {
-      "sector": "金融保險",
-      "net_buy_value_twd": 2496800471.0,
+      "sector": "電腦及週邊設備",
+      "net_buy_value_twd": 2930065693.0,
       "stocks": [
         {
-          "code": "2891",
-          "name": "中信金",
-          "net_buy_value_twd": 835967545.0
+          "code": "3017",
+          "name": "奇鋐",
+          "net_buy_value_twd": 1194936660.0
         },
         {
-          "code": "2882",
-          "name": "國泰金",
-          "net_buy_value_twd": 524027337.0
+          "code": "3706",
+          "name": "神達",
+          "net_buy_value_twd": 524469083.0
         },
         {
-          "code": "2887",
-          "name": "台新新光金",
-          "net_buy_value_twd": 265805353.0
+          "code": "6669",
+          "name": "緯穎",
+          "net_buy_value_twd": 436420050.0
         }
       ]
     }
