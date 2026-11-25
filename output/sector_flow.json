@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-24",
+  "report_date": "2026-11-25",
   "sectors": [
     {
-      "sector": "金融保險",
-      "net_buy_value_twd": 2229376691.0,
+      "sector": "半導體",
+      "net_buy_value_twd": 6110242442.0,
       "stocks": [
         {
-          "code": "2881",
-          "name": "富邦金",
-          "net_buy_value_twd": 643644998.0
+          "code": "3189",
+          "name": "景碩",
+          "net_buy_value_twd": 1222061940.0
         },
         {
-          "code": "2886",
-          "name": "兆豐金",
-          "net_buy_value_twd": 466972825.0
+          "code": "2449",
+          "name": "京元電子",
+          "net_buy_value_twd": 1078933530.0
         },
         {
-          "code": "2882",
-          "name": "國泰金",
-          "net_buy_value_twd": 386907592.0
+          "code": "3006",
+          "name": "晶豪科",
+          "net_buy_value_twd": 874216620.0
         }
       ]
     },
     {
-      "sector": "航運",
-      "net_buy_value_twd": 1711892524.0,
+      "sector": "電子零組件",
+      "net_buy_value_twd": 3118191694.0,
       "stocks": [
         {
-          "code": "2610",
-          "name": "華航",
-          "net_buy_value_twd": 596179395.0
+          "code": "2327",
+          "name": "國巨*",
+          "net_buy_value_twd": 1219391250.0
         },
         {
-          "code": "2618",
-          "name": "長榮航",
-          "net_buy_value_twd": 585233424.0
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 389352900.0
         },
         {
-          "code": "2603",
-          "name": "長榮",
-          "net_buy_value_twd": 409181265.0
+          "code": "2308",
+          "name": "台達電",
+          "net_buy_value_twd": 254157940.0
         }
       ]
     },
     {
-      "sector": "通信網路",
-      "net_buy_value_twd": 1448829628.0,
+      "sector": "光電",
+      "net_buy_value_twd": 2184253267.0,
       "stocks": [
         {
-          "code": "2412",
-          "name": "中華電",
-          "net_buy_value_twd": 941744898.0
+          "code": "3008",
+          "name": "大立光",
+          "net_buy_value_twd": 1301572300.0
         },
         {
-          "code": "4904",
-          "name": "遠傳",
-          "net_buy_value_twd": 220720135.0
+          "code": "3406",
+          "name": "玉晶光",
+          "net_buy_value_twd": 435108188.0
         },
         {
-          "code": "3045",
-          "name": "台灣大",
-          "net_buy_value_twd": 194731698.0
+          "code": "3019",
+          "name": "亞光",
+          "net_buy_value_twd": 100361592.0
         }
       ]
     }
