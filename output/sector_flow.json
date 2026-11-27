@@ -1,66 +1,66 @@
 {
-  "report_date": "2026-11-26",
+  "report_date": "2026-11-27",
   "sectors": [
     {
-      "sector": "電子零組件",
-      "net_buy_value_twd": 8108609232.0,
-      "stocks": [
-        {
-          "code": "2327",
-          "name": "國巨*",
-          "net_buy_value_twd": 2975749074.0
-        },
-        {
-          "code": "2313",
-          "name": "華通",
-          "net_buy_value_twd": 875028672.0
-        },
-        {
-          "code": "4958",
-          "name": "臻鼎-KY",
-          "net_buy_value_twd": 835456640.0
-        }
-      ]
-    },
-    {
       "sector": "半導體",
-      "net_buy_value_twd": 8049685006.0,
+      "net_buy_value_twd": 5215970915.0,
       "stocks": [
         {
           "code": "2408",
           "name": "南亞科",
-          "net_buy_value_twd": 2622923064.0
+          "net_buy_value_twd": 1739655764.0
+        },
+        {
+          "code": "3189",
+          "name": "景碩",
+          "net_buy_value_twd": 1293961680.0
         },
         {
           "code": "2344",
           "name": "華邦電",
-          "net_buy_value_twd": 1224635080.0
-        },
-        {
-          "code": "6770",
-          "name": "力積電",
-          "net_buy_value_twd": 1018229881.0
+          "net_buy_value_twd": 705896256.0
         }
       ]
     },
     {
-      "sector": "電腦及週邊設備",
-      "net_buy_value_twd": 4471081715.0,
+      "sector": "其他電子",
+      "net_buy_value_twd": 2551084431.0,
       "stocks": [
         {
-          "code": "3017",
-          "name": "奇鋐",
-          "net_buy_value_twd": 1405409850.0
+          "code": "2317",
+          "name": "鴻海",
+          "net_buy_value_twd": 1952411499.0
         },
         {
-          "code": "2382",
-          "name": "廣達",
-          "net_buy_value_twd": 813644211.0
+          "code": "2404",
+          "name": "漢唐",
+          "net_buy_value_twd": 317114304.0
         },
         {
-          "code": "2357",
-          "name": "華碩",
-          "net_buy_value_twd": 350366294.0
+          "code": "3665",
+          "name": "貿聯-KY",
+          "net_buy_value_twd": 227477040.0
+        }
+      ]
+    },
+    {
+      "sector": "電子零組件",
+      "net_buy_value_twd": 2213911453.0,
+      "stocks": [
+        {
+          "code": "2313",
+          "name": "華通",
+          "net_buy_value_twd": 867428964.0
+        },
+        {
+          "code": "3653",
+          "name": "健策",
+          "net_buy_value_twd": 603722495.0
+        },
+        {
+          "code": "2385",
+          "name": "群光",
+          "net_buy_value_twd": 279780100.0
         }
       ]
     }
